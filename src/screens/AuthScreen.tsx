@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GlassButton } from '../components/common/GlassButton';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, LogIn, UserPlus, AlertCircle } from 'lucide-react';
+import { Mail, Lock, User, LogIn, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export const AuthScreen: React.FC = () => {
   const { loginWithEmail, signUpWithEmail, loginWithGoogle } = useAuth();
@@ -9,6 +9,7 @@ export const AuthScreen: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +54,7 @@ export const AuthScreen: React.FC = () => {
       {/* Clean Centered Login Card */}
       <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in">
         
-        {/* Flush Circular Logo Header (No Inner White Gap) */}
+        {/* Flush Circular Logo Header */}
         <div className="text-center space-y-3">
           <div className="inline-block relative">
             <div className="w-36 h-36 rounded-full mx-auto shadow-2xl border-4 border-[#0284C7] overflow-hidden p-0 bg-white transition-transform hover:scale-105">
@@ -196,12 +197,20 @@ export const AuthScreen: React.FC = () => {
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
+                  className="w-full pl-10 pr-11 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1 transition-colors"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
