@@ -232,7 +232,7 @@ export const InvoiceScreen: React.FC = () => {
     );
   }
 
-  // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & FILTER MODAL
+  // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & CENTERED POPUP FILTER MODAL
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto">
       
@@ -353,10 +353,10 @@ export const InvoiceScreen: React.FC = () => {
         </div>
       )}
 
-      {/* FILTER DRAWER MODAL */}
+      {/* FILTER POPUP MODAL (FIXED INSET-0 Z-[100] SCREEN CENTERED) */}
       {filterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 w-full max-w-sm space-y-4">
+        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 w-full max-w-sm space-y-4 my-auto relative z-[101]">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 font-black text-slate-900 text-sm">
                 <SlidersHorizontal size={18} className="text-[#0284C7]" />
@@ -364,9 +364,9 @@ export const InvoiceScreen: React.FC = () => {
               </div>
               <button
                 onClick={() => setFilterModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer transition-colors"
               >
-                <X size={15} />
+                <X size={16} />
               </button>
             </div>
 
@@ -376,7 +376,7 @@ export const InvoiceScreen: React.FC = () => {
               <select
                 value={filterMonth}
                 onChange={(e) => setFilterMonth(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
               >
                 <option value="all">All Months</option>
                 {MONTH_NAMES.map((m) => (
@@ -391,7 +391,7 @@ export const InvoiceScreen: React.FC = () => {
               <select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
               >
                 <option value="all">All Years</option>
                 <option value="2026">2026</option>
@@ -403,13 +403,13 @@ export const InvoiceScreen: React.FC = () => {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={handleClearFilter}
-                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-xs font-bold"
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-xs font-bold cursor-pointer transition-colors"
               >
                 Reset
               </button>
               <button
                 onClick={handleApplyFilter}
-                className="flex-1 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95"
               >
                 <Check size={16} /> Apply Filter
               </button>
