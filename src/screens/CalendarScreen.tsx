@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CalendarGrid } from '../components/calendar/CalendarGrid';
 import { EditDateModal } from '../components/calendar/EditDateModal';
 import { useMilk } from '../context/MilkContext';
-import { CheckCircle2, XCircle, PlusCircle, Info } from 'lucide-react';
+import { CheckCircle2, XCircle, PlusCircle, Info, Plus } from 'lucide-react';
 
 export const CalendarScreen: React.FC = () => {
   const { selectedMonth } = useMilk();
@@ -19,13 +19,13 @@ export const CalendarScreen: React.FC = () => {
         <div>
           <h2 className="text-xl font-black text-slate-900">{monthName} Calendar</h2>
           <p className="text-xs font-semibold text-slate-500 mt-0.5">
-            Tap any past or current date card to override milk quantity
+            Tap any date card to record or edit your daily milk delivery
           </p>
         </div>
       </div>
 
       {/* Legend Chips */}
-      <div className="flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-3 text-xs shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-2xl p-3 text-xs shadow-xs">
         <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold">
           <CheckCircle2 size={15} className="text-emerald-600" /> Delivered
         </div>
@@ -37,6 +37,10 @@ export const CalendarScreen: React.FC = () => {
         <div className="flex items-center gap-1.5 text-amber-700 font-extrabold">
           <PlusCircle size={15} className="text-amber-600" /> Custom Qty
         </div>
+
+        <div className="flex items-center gap-1.5 text-slate-500 font-bold">
+          <Plus size={14} className="text-slate-400" /> Unlogged (+ Add)
+        </div>
       </div>
 
       {/* Main Grid Calendar Container */}
@@ -44,11 +48,11 @@ export const CalendarScreen: React.FC = () => {
         <CalendarGrid onSelectDate={(dStr) => setSelectedDate(dStr)} />
       </div>
 
-      {/* Tip Banner */}
+      {/* Manual Mode Tip Banner */}
       <div className="bg-cyan-50/80 border border-cyan-200 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-cyan-950 font-medium">
         <Info size={16} className="text-[#0284C7] shrink-0 mt-0.5" />
         <span>
-          Auto-logic automatically marks past & current days as delivered with your vendor default quantity. Future days remain disabled.
+          Pure Manual Mode: Days are not auto-marked. Tap any active date card to record milk deliveries. Dates prior to your account registration are disabled.
         </span>
       </div>
 
