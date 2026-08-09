@@ -35,7 +35,7 @@ export const DateCard: React.FC<DateCardProps> = ({
       return 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed text-slate-400';
     }
     if (isUnlogged) {
-      return 'bg-white border-dashed border-slate-300 text-slate-600 hover:border-[#0284C7] shadow-2xs';
+      return 'bg-white border-dashed border-slate-300 text-slate-500 hover:border-[#0284C7] shadow-2xs';
     }
     if (status === 'missed') {
       return 'bg-rose-50 border-rose-300 text-rose-950 shadow-xs hover:border-rose-500';
@@ -94,7 +94,10 @@ export const DateCard: React.FC<DateCardProps> = ({
         ) : isFuture ? (
           <span className="text-[10px] text-slate-400 font-medium">--</span>
         ) : isUnlogged ? (
-          <span className="text-[10px] text-slate-400 font-extrabold group-hover:text-[#0284C7]">+ Add</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-slate-400 font-bold">0 L</span>
+            <span className="text-[9px] text-[#0284C7] font-black opacity-0 group-hover:opacity-100 transition-opacity">+ Edit</span>
+          </div>
         ) : (
           <div className="flex items-center justify-between">
             <span className="text-[10px] sm:text-[11px] font-black tracking-tight">
