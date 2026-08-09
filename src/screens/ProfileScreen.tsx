@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
 import { formatDateDDMMYYYY } from '../utils/dateUtils';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Trash2, AlertTriangle, Mail, Lock } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
@@ -190,7 +190,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 5. DEDICATED PAGE VIEW: Profile Settings Page
+  // 5. DEDICATED PAGE VIEW: Profile Settings Page (With Read-Only Email ID)
   if (subView === 'profile_page') {
     return (
       <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
@@ -210,7 +210,7 @@ export const ProfileScreen: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-black text-slate-900">My Profile Settings</h2>
-                <p className="text-xs font-semibold text-slate-500">Update full name & mobile number</p>
+                <p className="text-xs font-semibold text-slate-500">Update full name & phone number</p>
               </div>
             </div>
             {savedUser && (
@@ -220,6 +220,7 @@ export const ProfileScreen: React.FC = () => {
             )}
           </div>
 
+          {/* Full Name */}
           <div>
             <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-700">Full Name</label>
             <div className="relative">
@@ -233,6 +234,27 @@ export const ProfileScreen: React.FC = () => {
             </div>
           </div>
 
+          {/* Registered Email ID (Read-only / Locked) */}
+          <div>
+            <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-700 flex items-center justify-between">
+              <span>Account Email ID</span>
+              <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1">
+                <Lock size={10} /> Locked (Primary ID)
+              </span>
+            </label>
+            <div className="relative">
+              <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="email"
+                value={user?.email || ''}
+                disabled
+                readOnly
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border border-slate-200 rounded-2xl text-xs font-bold text-slate-500 cursor-not-allowed select-none"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Phone Number */}
           <div>
             <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-700">Mobile Phone Number</label>
             <div className="relative">
@@ -362,7 +384,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 7. MAIN SETTINGS MENU VIEW WITH COPYRIGHT NOTICE
+  // 7. MAIN SETTINGS MENU VIEW: Clean top header without email/phone string clipping!
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
       
@@ -375,7 +397,7 @@ export const ProfileScreen: React.FC = () => {
         className="hidden"
       />
 
-      {/* User Header Profile Card */}
+      {/* User Clean Header Profile Card */}
       <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3">
         <div className="flex items-center gap-3.5">
           <div
@@ -386,34 +408,30 @@ export const ProfileScreen: React.FC = () => {
             <img
               src={user?.photoURL || '/logo.png'}
               alt="User Profile"
-              className="w-16 h-16 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 group-hover:brightness-90 transition-all"
+              className="w-14 h-14 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 group-hover:brightness-90 transition-all"
             />
             <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera size={18} />
+              <Camera size={16} />
             </div>
-            <span className="absolute bottom-0 right-0 w-5.5 h-5.5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-              <Camera size={11} />
+            <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+              <Camera size={10} />
             </span>
           </div>
 
           <div className="flex-1 min-w-0">
             <h2 className="text-base sm:text-lg font-black text-slate-900 truncate">
-              {user?.name || 'Customer Profile'}
+              {user?.name || 'Customer Account'}
             </h2>
 
-            <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
-              {user?.phone || 'Mobile not set'} • {user?.email || 'Email user'}
-            </p>
-
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full max-w-full">
+            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+              <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-extrabold px-2.5 py-0.5 rounded-full">
                 <Store size={12} className="text-[#0284C7] shrink-0" />
                 <span className="truncate">{user?.vendor?.name || 'Dairy Vendor'}</span>
               </div>
 
-              <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                <Calendar size={11} className="text-slate-500 shrink-0" />
-                <span className="truncate">Created: {formatDateDDMMYYYY(user?.createdAt)}</span>
+              <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-extrabold px-2.5 py-0.5 rounded-full">
+                <Calendar size={12} className="text-slate-500 shrink-0" />
+                <span className="truncate">Joined {formatDateDDMMYYYY(user?.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -435,7 +453,7 @@ export const ProfileScreen: React.FC = () => {
             </div>
             <div className="text-left min-w-0">
               <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors truncate">My Profile Settings</h3>
-              <p className="text-xs font-semibold text-slate-500 truncate">Edit full name & mobile number</p>
+              <p className="text-xs font-semibold text-slate-500 truncate">Edit full name, email & phone number</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />

@@ -3,10 +3,9 @@ import { useMilk } from '../context/MilkContext';
 import { useAuth } from '../context/AuthContext';
 import { WhatsAppPreviewModal } from '../components/invoice/WhatsAppPreviewModal';
 import { PaymentLedgerModal } from '../components/invoice/PaymentLedgerModal';
-import { GlassButton } from '../components/common/GlassButton';
 import { Badge } from '../components/common/Badge';
 import { getUserAvailableMonths, formatDateDDMMYYYY } from '../utils/dateUtils';
-import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText, Search, SlidersHorizontal, X, Check } from 'lucide-react';
+import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, FileText, Search, SlidersHorizontal, X, Check, PlusCircle } from 'lucide-react';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -87,9 +86,9 @@ export const InvoiceScreen: React.FC = () => {
     const selectedMonthLabel = userMonthList.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
 
     return (
-      <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-none">
+      <div className="space-y-5 pb-36 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-none">
         
-        {/* Top Action Bar: Back button + Top Right Download PDF Button */}
+        {/* Top Action Bar: Back button + RED Download PDF Button */}
         <div className="flex items-center justify-between print:hidden">
           <button
             onClick={() => setActiveMonthCard(null)}
@@ -99,10 +98,10 @@ export const InvoiceScreen: React.FC = () => {
             <span>Back to All Month Invoices</span>
           </button>
 
-          {/* Top Right Download PDF Button */}
+          {/* VIBRANT RED DOWNLOAD PDF BUTTON */}
           <button
             onClick={() => handleDownloadPDF(selectedMonthLabel)}
-            className="px-4 py-2 bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white hover:brightness-110 rounded-2xl text-xs font-black shadow-md shadow-cyan-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+            className="px-4 py-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white rounded-2xl text-xs font-black shadow-md shadow-rose-500/25 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
           >
             <Download size={15} />
             <span>Download PDF</span>
@@ -110,112 +109,119 @@ export const InvoiceScreen: React.FC = () => {
         </div>
 
         {/* Printable Detailed Invoice Document */}
-        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-900 print:shadow-none print:border-none print:rounded-none print:p-2">
+        <div className="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-8 shadow-xl space-y-5 text-slate-900 print:shadow-none print:border-none print:rounded-none print:p-2">
           
-          {/* Invoice Document Header */}
-          <div className="flex items-start justify-between border-b border-slate-200 pb-5">
-            <div className="flex items-center gap-3">
-              <img
-                src="/logo.png"
-                alt="RW-Milk Tracker"
-                className="w-14 h-14 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
-              />
-              <div>
-                <h1 className="text-xl font-black text-slate-900 tracking-tight">RW-Milk Tracker Invoice</h1>
-                <p className="text-xs font-extrabold text-[#0284C7]">{selectedMonthLabel}</p>
-                <p className="text-[11px] font-semibold text-slate-500 mt-0.5">Invoice ID: INV-{activeMonthCard.replace('-', '')}</p>
+          {/* Invoice Header: Clean 1-Line Title & Right Badge */}
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/logo.png"
+                  alt="RW-Milk Tracker"
+                  className="w-12 h-12 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
+                />
+                <div>
+                  <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
+                    RW-Milk Tracker Invoice
+                  </h1>
+                  <p className="text-xs font-extrabold text-[#0284C7]">{selectedMonthLabel}</p>
+                </div>
+              </div>
+
+              {/* Status Badge & Issued Date Right Aligned */}
+              <div className="text-right shrink-0">
+                <Badge variant={invoice.status === 'paid' ? 'paid' : invoice.status === 'partial' ? 'custom' : 'unpaid'}>
+                  {invoice.status === 'paid' ? 'Paid' : invoice.status === 'partial' ? 'Partial Due' : 'Unpaid Dues'}
+                </Badge>
+                <p className="text-[10px] font-bold text-slate-500 mt-1">Issued: {formatDateDDMMYYYY()}</p>
               </div>
             </div>
 
-            <div className="text-right">
-              <Badge variant={invoice.status === 'paid' ? 'paid' : invoice.status === 'partial' ? 'custom' : 'unpaid'}>
-                {invoice.status === 'paid' ? 'Paid' : invoice.status === 'partial' ? 'Partial Settlement' : 'Unpaid Dues'}
-              </Badge>
-              <p className="text-[11px] font-bold text-slate-500 mt-2">Issued: {formatDateDDMMYYYY()}</p>
-            </div>
+            {/* Divider Line */}
+            <div className="w-full border-b border-slate-200 pt-1" />
           </div>
 
-          {/* Customer & Vendor Details */}
-          <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
-            <div>
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Customer Details</span>
-              <p className="font-extrabold text-slate-900 mt-1 text-sm">{user?.name || 'Customer'}</p>
-              <p className="text-slate-600 font-semibold">{user?.phone || 'No phone set'}</p>
-              <p className="text-slate-500 font-medium">{user?.email}</p>
+          {/* Customer & Vendor Details (Clean Stacked Layout - No Text Overlap!) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">CUSTOMER DETAILS</span>
+              <p className="font-extrabold text-slate-900 text-sm">{user?.name || 'Customer'}</p>
+              <p className="text-slate-700 font-bold">{user?.phone || 'No phone set'}</p>
+              <p className="text-slate-500 font-medium truncate">{user?.email}</p>
             </div>
 
-            <div>
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Dairy Vendor</span>
-              <p className="font-extrabold text-slate-900 mt-1 text-sm">{user?.vendor?.name || 'Amul Milk Express'}</p>
-              <p className="text-slate-600 font-semibold">Phone: {user?.vendor?.phone || 'Vendor Phone'}</p>
+            <div className="space-y-0.5 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">DAIRY VENDOR</span>
+              <p className="font-extrabold text-slate-900 text-sm">{user?.vendor?.name || 'Amul Milk Express'}</p>
+              <p className="text-slate-700 font-bold">Phone: {user?.vendor?.phone || 'Vendor Phone'}</p>
               <p className="text-slate-500 font-medium">Rate: ₹{user?.vendor?.defaultPricePerLitre} / Litre</p>
             </div>
           </div>
 
-          {/* Cost Summary Breakdown */}
-          <div className="space-y-3">
+          {/* Cost Summary Breakdown Table */}
+          <div className="space-y-2.5">
             <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Billing Summary</h3>
             <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
-              <div className="p-3.5 flex justify-between text-xs border-b border-slate-100">
+              <div className="p-3 flex justify-between text-xs border-b border-slate-100">
                 <span className="font-semibold text-slate-600">Total Days in Month</span>
                 <span className="font-extrabold text-slate-900">{invoice.totalDays} Days</span>
               </div>
 
-              <div className="p-3.5 flex justify-between text-xs border-b border-slate-100">
+              <div className="p-3 flex justify-between text-xs border-b border-slate-100">
                 <span className="font-semibold text-slate-600">Delivered Days</span>
                 <span className="font-extrabold text-emerald-700">{invoice.deliveredDays} Days</span>
               </div>
 
-              <div className="p-3.5 flex justify-between text-xs border-b border-slate-100">
+              <div className="p-3 flex justify-between text-xs border-b border-slate-100">
                 <span className="font-semibold text-slate-600">Missed Days (0L)</span>
                 <span className="font-extrabold text-rose-600">{invoice.missedDays} Days</span>
               </div>
 
-              <div className="p-3.5 flex justify-between text-xs border-b border-slate-100">
+              <div className="p-3 flex justify-between text-xs border-b border-slate-100">
                 <span className="font-semibold text-slate-600">Total Milk Consumed</span>
                 <span className="font-extrabold text-[#0284C7]">{invoice.totalLitres.toFixed(1)} Litres</span>
               </div>
 
-              <div className="p-3.5 flex justify-between text-xs border-b border-slate-100 bg-slate-50">
+              <div className="p-3 flex justify-between text-xs border-b border-slate-100 bg-slate-50">
                 <span className="font-semibold text-slate-600">Current Month Milk Bill ({invoice.totalLitres.toFixed(1)}L × ₹{user?.vendor?.defaultPricePerLitre})</span>
                 <span className="font-extrabold text-slate-900">₹{invoice.currentMonthCost.toLocaleString('en-IN')}</span>
               </div>
 
               {invoice.previousPendingBalance > 0 && (
-                <div className="p-3.5 flex justify-between text-xs border-b border-slate-100 bg-amber-50">
+                <div className="p-3 flex justify-between text-xs border-b border-slate-100 bg-amber-50">
                   <span className="font-semibold text-amber-900">Carryover Previous Pending Dues</span>
                   <span className="font-extrabold text-amber-800">+₹{invoice.previousPendingBalance.toLocaleString('en-IN')}</span>
                 </div>
               )}
 
-              <div className="p-4 flex justify-between items-center bg-cyan-50/80">
-                <span className="font-black text-sm text-slate-900">Total Net Amount Payable</span>
-                <span className="font-black text-xl text-[#0284C7]">₹{invoice.totalAmountDue.toLocaleString('en-IN')}</span>
+              <div className="p-3.5 flex justify-between items-center bg-cyan-50/80">
+                <span className="font-black text-xs sm:text-sm text-slate-900">Total Net Amount Payable</span>
+                <span className="font-black text-lg sm:text-xl text-[#0284C7]">₹{invoice.totalAmountDue.toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions (Hidden during print) */}
-          <div className="grid grid-cols-2 gap-3 pt-2 print:hidden">
-            <GlassButton
-              variant="primary"
-              size="md"
-              className="w-full font-black py-3 shadow-md shadow-emerald-500/20"
-              icon={<MessageSquare size={16} />}
+          {/* Quick Actions Bar (Green WhatsApp Box & Add Payment Paid Button) */}
+          <div className="grid grid-cols-2 gap-2.5 pt-2 print:hidden">
+            {/* Green WhatsApp Box */}
+            <button
+              type="button"
               onClick={() => setShowWhatsAppModal(true)}
+              className="py-3 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs font-black shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
             >
-              Send WhatsApp Invoice
-            </GlassButton>
+              <MessageSquare size={16} className="shrink-0" />
+              <span className="truncate">Send WhatsApp Invoice</span>
+            </button>
 
-            <GlassButton
-              variant="secondary"
-              size="md"
-              className="w-full font-black py-3"
-              icon={<CreditCard size={16} />}
+            {/* Add Payment Received Entry */}
+            <button
+              type="button"
               onClick={() => setShowPaymentModal(true)}
+              className="py-3 px-3 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
             >
-              Record Payment
-            </GlassButton>
+              <PlusCircle size={16} className="shrink-0 text-cyan-400" />
+              <span className="truncate">Add Payment Paid</span>
+            </button>
           </div>
         </div>
 
@@ -232,9 +238,9 @@ export const InvoiceScreen: React.FC = () => {
     );
   }
 
-  // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & CENTERED POPUP FILTER MODAL
+  // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & FILTER
   return (
-    <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto">
+    <div className="space-y-5 pb-36 animate-fade-in max-w-4xl mx-auto">
       
       {/* Header */}
       <div>
@@ -353,9 +359,9 @@ export const InvoiceScreen: React.FC = () => {
         </div>
       )}
 
-      {/* FILTER POPUP MODAL (FIXED INSET-0 Z-[100] SCREEN CENTERED) */}
+      {/* FILTER POPUP MODAL */}
       {filterModalOpen && (
-        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-fade-in">
           <div className="bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 w-full max-w-sm space-y-4 my-auto relative z-[101]">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 font-black text-slate-900 text-sm">
