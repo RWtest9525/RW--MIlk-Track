@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
 import { formatDateDDMMYYYY } from '../utils/dateUtils';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2 } from 'lucide-react';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2, CheckCircle2 } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
@@ -153,7 +153,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 4. DEDICATED PAGE VIEW: About RW-Milk Tracker
+  // 4. DEDICATED PAGE VIEW: About & How to Use RW-Milk Tracker
   if (subView === 'about_page') {
     return (
       <div className="space-y-5 pb-28 animate-fade-in max-w-2xl mx-auto">
@@ -165,23 +165,56 @@ export const ProfileScreen: React.FC = () => {
           <span>Back to Settings</span>
         </button>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4 text-slate-900 text-center">
-          <img
-            src="/logo.png"
-            alt="RW-Milk Tracker"
-            className="w-20 h-20 rounded-full border-4 border-[#0284C7] object-cover shadow-md mx-auto"
-          />
-          <div>
-            <h2 className="text-xl font-black text-slate-900">RW-Milk Tracker</h2>
-            <p className="text-xs font-extrabold text-[#0284C7]">Version 1.0.0 (Production Build)</p>
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-5 text-slate-900">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <img
+              src="/logo.png"
+              alt="RW-Milk Tracker"
+              className="w-12 h-12 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
+            />
+            <div>
+              <h2 className="text-lg font-black text-slate-900">About RW-Milk Tracker</h2>
+              <p className="text-xs font-extrabold text-[#0284C7]">Daily Milk Tracking & Automated Monthly Bills</p>
+            </div>
           </div>
 
-          <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed font-semibold">
-            RW-Milk Tracker is an intelligent, modern dairy logistics app designed for households and dairy vendors to track daily milk consumption, settle monthly dues, and generate PDF statements.
-          </p>
+          {/* App Purpose */}
+          <div className="space-y-1.5 text-xs text-slate-700">
+            <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0284C7]">App Purpose (Yeh App Kis Kaam Ke Liye Hai)</h4>
+            <p className="font-semibold leading-relaxed">
+              RW-Milk Tracker aapke ghar daily aane wale milk ka exact record rakhne aur month ke end me bina kisi mistake ke accurate bill calculate karne ke liye banaya gaya hai.
+            </p>
+          </div>
 
-          <div className="pt-4 border-t border-slate-100 text-[11px] font-bold text-slate-500">
-            Powered by Firebase Cloud Firestore & React 18
+          {/* How to Use Guide */}
+          <div className="space-y-2.5 pt-2 border-t border-slate-100">
+            <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0284C7]">How to Use (Kaise Use Karein)</h4>
+
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2 text-xs">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 size={16} className="text-[#0284C7] shrink-0 mt-0.5" />
+                <div>
+                  <strong className="font-black text-slate-900 block">1. Daily Milk Record Entry</strong>
+                  <span className="text-slate-600 font-medium">Dashboard ya Calendar page par ja kar kisi bhi Date Card par tap karein aur us din jitna milk aaya (e.g. 1.5L, 2L, ya Missed) record karein.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="font-black text-slate-900 block">2. Monthly Invoice & Dues</strong>
+                  <span className="text-slate-600 font-medium">Invoices tab me har month ka card ban jata hai. Card click karke pure month ka total litres aur bill amount due dekhein.</span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <CheckCircle2 size={16} className="text-purple-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="font-black text-slate-900 block">3. WhatsApp Sharing & PDF Download</strong>
+                  <span className="text-slate-600 font-medium">Statement ko WhatsApp par vendor ko bhejein ya top right Download PDF button se official PDF download karein.</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
