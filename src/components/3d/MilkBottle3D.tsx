@@ -11,71 +11,98 @@ const BottleMesh: React.FC<BottleModelProps> = ({ fillPercentage }) => {
   const groupRef = useRef<THREE.Group>(null);
   const liquidRef = useRef<THREE.Mesh>(null);
 
-  // Smooth rotation
+  // Smooth floating rotation
   useFrame((state, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.4;
+      groupRef.current.rotation.y += delta * 0.5;
     }
   });
 
-  // Calculate liquid height based on percentage (max height = 1.9)
-  const liquidHeight = Math.max(0.08, (fillPercentage / 100) * 1.8);
+  // Calculate liquid fill level (max bottle height = 2.2)
+  const clampedPct = Math.min(100, Math.max(5, fillPercentage));
+  const liquidHeight = (clampedPct / 100) * 1.7;
   const liquidPosY = -0.9 + liquidHeight / 2;
 
   return (
-    <group ref={groupRef} position={[0, -0.15, 0]}>
-      {/* Glass Bottle Body Outer Shell */}
-      <mesh position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.68, 0.68, 2.0, 32, 1, true]} />
+    <group ref={groupRef} position={[0, -0.1, 0]}>
+      {/* --- 1. GLASS BOTTLE SILHOUETTE --- */}
+      
+      {/* Lower Cylindrical Body */}
+      <mesh position={[0, -0.3, 0]}>
+        <cylinderGeometry args={[0.72, 0.72, 1.4, 32, 1, true]} />
         <meshPhysicalMaterial
-          color="#0284C7"
-          transparent
-          opacity={0.25}
-          roughness={0.05}
-          metalness={0.1}
-          transmission={0.92}
-          ior={1.5}
-          thickness={0.25}
-        />
-      </mesh>
-
-      {/* Bottle Neck */}
-      <mesh position={[0, 1.25, 0]}>
-        <cylinderGeometry args={[0.35, 0.52, 0.5, 32]} />
-        <meshPhysicalMaterial
-          color="#0284C7"
+          color="#E0F2FE"
           transparent
           opacity={0.3}
           roughness={0.05}
-          transmission={0.92}
+          metalness={0.1}
+          transmission={0.94}
+          ior={1.5}
+          thickness={0.3}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
         />
       </mesh>
 
-      {/* Glossy Blue Cap (Matching RW-Milk Tracker Logo) */}
-      <mesh position={[0, 1.55, 0]}>
-        <cylinderGeometry args={[0.37, 0.37, 0.12, 32]} />
+      {/* Tapered Glass Shoulder (Smooth Bottle Curve) */}
+      <mesh position={[0, 0.65, 0]}>
+        <cylinderGeometry args={[0.38, 0.72, 0.5, 32, 1, true]} />
+        <meshPhysicalMaterial
+          color="#E0F2FE"
+          transparent
+          opacity={0.35}
+          roughness={0.05}
+          transmission={0.94}
+          ior={1.5}
+          clearcoat={1.0}
+        />
+      </mesh>
+
+      {/* Narrow Glass Neck */}
+      <mesh position={[0, 1.1, 0]}>
+        <cylinderGeometry args={[0.36, 0.38, 0.4, 32]} />
+        <meshPhysicalMaterial
+          color="#E0F2FE"
+          transparent
+          opacity={0.35}
+          roughness={0.05}
+          transmission={0.94}
+        />
+      </mesh>
+
+      {/* Glass Mouth Collar Rim */}
+      <mesh position={[0, 1.32, 0]}>
+        <torusGeometry args={[0.36, 0.04, 16, 32]} />
+        <meshPhysicalMaterial color="#BAE6FD" transparent opacity={0.5} roughness={0.1} />
+      </mesh>
+
+      {/* Glossy Deep Blue Cap (Matching RW-Milk Tracker Brand) */}
+      <mesh position={[0, 1.45, 0]}>
+        <cylinderGeometry args={[0.38, 0.38, 0.16, 32]} />
         <meshStandardMaterial
           color="#0284C7"
-          metalness={0.5}
-          roughness={0.1}
-        />
-      </mesh>
-
-      {/* Pure White Fresh Milk Liquid */}
-      <mesh ref={liquidRef} position={[0, liquidPosY, 0]}>
-        <cylinderGeometry args={[0.64, 0.64, liquidHeight, 32]} />
-        <meshStandardMaterial
-          color="#FFFFFF"
-          roughness={0.1}
-          metalness={0.02}
-          emissive="#F8FAFC"
+          metalness={0.4}
+          roughness={0.15}
+          emissive="#0369A1"
           emissiveIntensity={0.2}
         />
       </mesh>
 
-      {/* Base Glass Bottom */}
+      {/* --- 2. DYNAMIC PURE WHITE FRESH MILK LIQUID --- */}
+      <mesh ref={liquidRef} position={[0, liquidPosY, 0]}>
+        <cylinderGeometry args={[0.68, 0.68, liquidHeight, 32]} />
+        <meshStandardMaterial
+          color="#FFFFFF"
+          roughness={0.08}
+          metalness={0.01}
+          emissive="#F8FAFC"
+          emissiveIntensity={0.25}
+        />
+      </mesh>
+
+      {/* Glass Base Bottom */}
       <mesh position={[0, -1.02, 0]}>
-        <cylinderGeometry args={[0.68, 0.68, 0.08, 32]} />
+        <cylinderGeometry args={[0.72, 0.72, 0.08, 32]} />
         <meshPhysicalMaterial color="#38BDF8" transparent opacity={0.4} />
       </mesh>
     </group>
@@ -84,18 +111,18 @@ const BottleMesh: React.FC<BottleModelProps> = ({ fillPercentage }) => {
 
 export const MilkBottle3D: React.FC<{ fillPercentage: number; height?: number }> = ({ 
   fillPercentage,
-  height = 200 
+  height = 190 
 }) => {
   return (
     <div style={{ width: '100%', height: `${height}px`, position: 'relative' }}>
       <Canvas style={{ background: 'transparent' }}>
-        <PerspectiveCamera makeDefault position={[0, 0.5, 4.2]} fov={45} />
-        <ambientLight intensity={1.1} />
-        <directionalLight position={[5, 8, 5]} intensity={1.8} />
-        <pointLight position={[-4, -2, -2]} intensity={0.8} color="#0284C7" />
-        <pointLight position={[3, 3, 3]} intensity={1.0} color="#38BDF8" />
+        <PerspectiveCamera makeDefault position={[0, 0.4, 4.3]} fov={45} />
+        <ambientLight intensity={1.2} />
+        <directionalLight position={[5, 8, 5]} intensity={2.0} color="#FFFFFF" />
+        <pointLight position={[-4, 2, -2]} intensity={1.2} color="#38BDF8" />
+        <pointLight position={[4, -2, 3]} intensity={1.0} color="#0284C7" />
         
-        <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
+        <Float speed={2.5} rotationIntensity={0.4} floatIntensity={0.6}>
           <BottleMesh fillPercentage={fillPercentage} />
         </Float>
       </Canvas>

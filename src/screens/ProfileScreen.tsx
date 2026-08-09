@@ -239,7 +239,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 4. MAIN SETTINGS MENU VIEW WITH DIRECT AVATAR GALLERY PICKER ON TOP CARD
+  // 4. MAIN SETTINGS MENU VIEW WITH INTERACTIVE CAMERA AVATAR (NO TEXT BUTTON)
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
       
@@ -252,13 +252,13 @@ export const ProfileScreen: React.FC = () => {
         className="hidden"
       />
 
-      {/* User Header Profile Card with Direct Gallery Photo Chooser & Account Created Date */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3">
-        <div className="flex items-center gap-4">
+      {/* User Header Profile Card with Interactive Camera Photo Chooser */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3">
+        <div className="flex items-center gap-3.5">
           <div
             onClick={() => fileInputRef.current?.click()}
             className="relative group cursor-pointer shrink-0"
-            title="Click to choose profile photo from gallery"
+            title="Tap to choose profile photo from gallery"
           >
             <img
               src={user?.photoURL || '/logo.png'}
@@ -268,37 +268,30 @@ export const ProfileScreen: React.FC = () => {
             <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
               <Camera size={18} />
             </div>
-            <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border border-white shadow-sm">
-              <Camera size={10} />
+            <span className="absolute bottom-0 right-0 w-5.5 h-5.5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+              <Camera size={11} />
             </span>
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-black text-slate-900 truncate">
-                {user?.name || 'Customer Profile'}
-              </h2>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="text-[10px] font-black text-[#0284C7] hover:underline cursor-pointer"
-              >
-                Change Photo
-              </button>
-            </div>
-            <p className="text-xs font-semibold text-slate-500 truncate">
+            <h2 className="text-base sm:text-lg font-black text-slate-900 truncate">
+              {user?.name || 'Customer Profile'}
+            </h2>
+
+            <p className="text-xs font-semibold text-slate-500 truncate mt-0.5">
               {user?.phone || 'Mobile not set'} • {user?.email || 'Email user'}
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 mt-1.5">
-              <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                <Store size={12} className="text-[#0284C7]" />
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full max-w-full">
+                <Store size={12} className="text-[#0284C7] shrink-0" />
                 <span className="truncate">{user?.vendor?.name || 'Dairy Vendor'}</span>
               </div>
 
               {/* Account Created Date DD/MM/YYYY */}
               <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                <Calendar size={11} className="text-slate-500" />
-                <span>Account Created: {formatDateDDMMYYYY(user?.createdAt)}</span>
+                <Calendar size={11} className="text-slate-500 shrink-0" />
+                <span className="truncate">Created: {formatDateDDMMYYYY(user?.createdAt)}</span>
               </div>
             </div>
           </div>
@@ -314,16 +307,16 @@ export const ProfileScreen: React.FC = () => {
           onClick={() => setSubView('profile_page')}
           className="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-3xl p-4 flex items-center justify-between shadow-xs transition-all cursor-pointer group"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-[#0284C7] shrink-0 group-hover:scale-105 transition-transform">
               <User size={20} />
             </div>
-            <div className="text-left">
-              <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors">My Profile Settings</h3>
-              <p className="text-[11px] font-semibold text-slate-500">Edit full name & mobile number</p>
+            <div className="text-left min-w-0">
+              <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors truncate">My Profile Settings</h3>
+              <p className="text-[11px] font-semibold text-slate-500 truncate">Edit full name & mobile number</p>
             </div>
           </div>
-          <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
         </button>
 
         {/* Button 2: Vendor & Delivery Settings */}
@@ -332,16 +325,16 @@ export const ProfileScreen: React.FC = () => {
           onClick={() => setSubView('vendor_page')}
           className="w-full bg-white hover:bg-slate-50 border border-slate-200 rounded-3xl p-4 flex items-center justify-between shadow-xs transition-all cursor-pointer group"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-105 transition-transform">
               <Store size={20} />
             </div>
-            <div className="text-left">
-              <h3 className="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors">Vendor & Milk Delivery Settings</h3>
-              <p className="text-[11px] font-semibold text-slate-500">Dairy name, price per litre & default daily quantity</p>
+            <div className="text-left min-w-0">
+              <h3 className="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors truncate">Vendor & Milk Delivery Settings</h3>
+              <p className="text-[11px] font-semibold text-slate-500 truncate">Dairy name, price per litre & default daily quantity</p>
             </div>
           </div>
-          <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
         </button>
 
         {/* Line-by-Line Stacked Legal & App Options */}
@@ -352,44 +345,44 @@ export const ProfileScreen: React.FC = () => {
             onClick={() => setLegalModalType('terms')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <FileText size={16} className="text-[#0284C7]" />
-              <span>Terms & Conditions</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <FileText size={16} className="text-[#0284C7] shrink-0" />
+              <span className="truncate">Terms & Conditions</span>
             </div>
-            <ChevronRight size={16} className="text-slate-400" />
+            <ChevronRight size={16} className="text-slate-400 shrink-0 ml-2" />
           </button>
 
           <button
             onClick={() => setLegalModalType('privacy')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <ShieldCheck size={16} className="text-emerald-600" />
-              <span>Privacy Policy</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+              <span className="truncate">Privacy Policy</span>
             </div>
-            <ChevronRight size={16} className="text-slate-400" />
+            <ChevronRight size={16} className="text-slate-400 shrink-0 ml-2" />
           </button>
 
           <button
             onClick={() => setLegalModalType('about')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <Info size={16} className="text-purple-600" />
-              <span>About RW-Milk Tracker (v1.0)</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Info size={16} className="text-purple-600 shrink-0" />
+              <span className="truncate">About RW-Milk Tracker (v1.0)</span>
             </div>
-            <ChevronRight size={16} className="text-slate-400" />
+            <ChevronRight size={16} className="text-slate-400 shrink-0 ml-2" />
           </button>
 
           <button
             onClick={() => setSubView('delete_page')}
             className="w-full p-3 rounded-2xl hover:bg-rose-50 flex items-center justify-between text-xs font-bold text-rose-600 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-2.5">
-              <Trash2 size={16} className="text-rose-600" />
-              <span>Delete Account & Data (Play Store)</span>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Trash2 size={16} className="text-rose-600 shrink-0" />
+              <span className="truncate">Delete Account & Data (Play Store)</span>
             </div>
-            <ChevronRight size={16} className="text-rose-400" />
+            <ChevronRight size={16} className="text-rose-400 shrink-0 ml-2" />
           </button>
         </div>
 
