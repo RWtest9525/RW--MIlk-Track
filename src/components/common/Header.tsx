@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useMilk } from '../../context/MilkContext';
-import { ChevronDown, Store, UserCheck, Calendar as CalendarIcon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
+import { ChevronDown, Store, Sun, Moon, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -11,15 +12,12 @@ const MONTH_NAMES = [
 export const Header: React.FC = () => {
   const { user } = useAuth();
   const { selectedMonth, setSelectedMonth } = useMilk();
-
-  const currentYear = parseInt(selectedMonth.split('-')[0], 10);
-  const currentMonthIdx = parseInt(selectedMonth.split('-')[1], 10) - 1;
+  const { theme, toggleTheme } = useTheme();
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(e.target.value);
   };
 
-  // Generate options for previous 6 months and next 3 months
   const monthOptions = [];
   const now = new Date();
   for (let i = -5; i <= 3; i++) {
@@ -30,49 +28,73 @@ export const Header: React.FC = () => {
   }
 
   return (
-    <header className="px-5 pt-6 pb-4 bg-[#0B0F17]/90 backdrop-blur-lg sticky top-0 z-30 border-b border-white/5">
-      <div className="flex items-center justify-between gap-3">
+    <header className={`px-5 pt-5 pb-3 sticky top-0 z-30 border-b backdrop-blur-2xl transition-colors duration-300 ${
+      theme === 'dark' 
+        ? 'bg-[#080C14]/90 border-white/5 text-slate-100' 
+        : 'bg-white/90 border-slate-200/80 text-slate-900'
+    }`}>
+      <div className="flex items-center justify-between gap-2">
         {/* User Info & Avatar */}
         <div className="flex items-center gap-3">
           <div className="relative">
             <img
               src={user?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
               alt={user?.name}
-              className="w-11 h-11 rounded-full border-2 border-cyan-400/40 object-cover shadow-md shadow-cyan-500/20"
+              className="w-11 h-11 rounded-full border-2 border-cyan-400 object-cover shadow-md shadow-cyan-500/20"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#0B0F17] rounded-full" />
+            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white dark:border-[#080C14] rounded-full" />
           </div>
 
           <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-base font-bold text-slate-100 leading-tight">
+            <div className="flex items-center gap-1">
+              <h1 className="text-sm font-extrabold leading-tight">
                 Hello, {user?.name.split(' ')[0]} 👋
               </h1>
             </div>
             
             {/* Vendor Chip */}
-            <div className="flex items-center gap-1 text-[11px] text-cyan-400 font-medium mt-0.5">
-              <Store size={12} className="text-cyan-400" />
-              <span className="truncate max-w-[130px]">{user?.vendor.name}</span>
+            <div className="flex items-center gap-1 text-[11px] text-cyan-600 dark:text-cyan-400 font-semibold mt-0.5">
+              <Store size={12} className="text-cyan-500" />
+              <span className="truncate max-w-[120px]">{user?.vendor.name}</span>
             </div>
           </div>
         </div>
 
-        {/* Month Selector Pill */}
-        <div className="relative inline-flex items-center bg-slate-900/90 border border-slate-700/80 rounded-2xl px-3 py-2 text-xs font-semibold text-slate-200 shadow-md">
-          <CalendarIcon size={14} className="text-cyan-400 mr-2" />
-          <select
-            value={selectedMonth}
-            onChange={handleMonthChange}
-            className="bg-transparent text-slate-200 focus:outline-none appearance-none pr-5 cursor-pointer text-xs font-semibold"
+        {/* Right Controls: Theme Switcher & Month Selector */}
+        <div className="flex items-center gap-2">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={`w-9 h-9 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+              theme === 'dark'
+                ? 'bg-slate-900 border-slate-700 text-amber-400 hover:bg-slate-800'
+                : 'bg-slate-100 border-slate-300 text-cyan-600 hover:bg-slate-200'
+            }`}
+            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
           >
-            {monthOptions.map((opt) => (
-              <option key={opt.key} value={opt.key} className="bg-slate-900 text-slate-200">
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown size={14} className="absolute right-2.5 text-slate-400 pointer-events-none" />
+            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+
+          {/* Month Selector Pill */}
+          <div className={`relative inline-flex items-center border rounded-2xl px-2.5 py-1.5 text-xs font-bold transition-colors ${
+            theme === 'dark'
+              ? 'bg-slate-900 border-slate-700 text-slate-200'
+              : 'bg-slate-100 border-slate-300 text-slate-800'
+          }`}>
+            <CalendarIcon size={13} className="text-cyan-500 mr-1.5" />
+            <select
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="bg-transparent focus:outline-none appearance-none pr-4 cursor-pointer text-xs font-bold"
+            >
+              {monthOptions.map((opt) => (
+                <option key={opt.key} value={opt.key} className={theme === 'dark' ? 'bg-slate-900 text-slate-200' : 'bg-white text-slate-800'}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={13} className="absolute right-2 text-slate-400 pointer-events-none" />
+          </div>
         </div>
       </div>
     </header>
