@@ -12,6 +12,7 @@ interface MilkContextType {
   updateDateLog: (date: string, status: DeliveryStatus, quantity: number, notes?: string) => Promise<void>;
   markMonthAsPaid: (amountPaid: number, note?: string, paymentMethod?: PaymentRecord['paymentMethod']) => Promise<void>;
   refreshMonthData: () => Promise<void>;
+  clearMonthLogs: () => Promise<void>;
 }
 
 const getDaysInMonth = (year: number, monthIndex: number): number => {
@@ -32,7 +33,6 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [amountPaid, setAmountPaid] = useState<number>(0);
   const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
 
-  const defaultQty = user?.vendor?.defaultDailyQuantity ?? 1.5;
   const pricePerLitre = user?.vendor?.defaultPricePerLitre ?? 60;
 
   // Parse year & month
@@ -72,7 +72,7 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, [user?.uid, selectedMonth]);
 
-  // Calculate monthly stats based on user's manual logs
+  // Calculate monthly stats based strictly on user's manual logs
   const invoice = useMemo((): MonthlyInvoice => {
     let deliveredDays = 0;
     let missedDays = 0;
@@ -139,34 +139,40 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await setDoc(monthDocRef, { logs: updatedLogs }, { merge: true });
   };
 
+  const clearMonthLogs = async () => {
+    if (!user?.uid) return;
+    setLogs({});
+    const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
+    await setDoc(monthDocRef, { logs: {} }, { merge: true });
+  };
+
   const markMonthAsPaid = async (
-    paymentAmount: number,
+    paidAmount: number,
     note?: string,
-    paymentMethod: PaymentRecord['paymentMethod'] = 'upi'
+    paymentMethod: PaymentRecord['paymentMethod'] = 'cash'
   ) => {
     if (!user?.uid) return;
 
     const newRecord: PaymentRecord = {
-      id: 'pay_' + Date.now(),
-      amount: paymentAmount,
+      id: `pay_${Date.now()}`,
       date: new Date().toISOString(),
-      note: note || 'Monthly milk settlement',
+      amount: paidAmount,
       paymentMethod,
+      note,
     };
 
-    const newAmountPaid = amountPaid + paymentAmount;
-    const newHistory = [newRecord, ...paymentHistory];
+    const newPaymentHistory = [newRecord, ...paymentHistory];
+    const newTotalPaid = amountPaid + paidAmount;
 
-    setAmountPaid(newAmountPaid);
-    setPaymentHistory(newHistory);
+    setAmountPaid(newTotalPaid);
+    setPaymentHistory(newPaymentHistory);
 
     const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
     await setDoc(
       monthDocRef,
       {
-        amountPaid: newAmountPaid,
-        paymentHistory: newHistory,
-        updatedAt: new Date().toISOString(),
+        amountPaid: newTotalPaid,
+        paymentHistory: newPaymentHistory,
       },
       { merge: true }
     );
@@ -191,6 +197,7 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateDateLog,
         markMonthAsPaid,
         refreshMonthData,
+        clearMonthLogs,
       }}
     >
       {children}
