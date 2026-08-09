@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Listen to Firebase Auth Changes & Handle Redirect Results for APK/Mobile Web
   useEffect(() => {
-    // Process redirect result from APK / Mobile Web login flow
+    // Process redirect result from APK / Mobile Web login flow if any
     getRedirectResult(auth)
       .then(async (result) => {
         if (result?.user) {
@@ -152,23 +152,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       prompt: 'select_account'
     });
 
-    const isMobileOrAPK = /android|iphone|ipad|ipod/i.test(navigator.userAgent) || 
-                          window.matchMedia('(display-mode: standalone)').matches ||
-                          navigator.userAgent.toLowerCase().includes('wv');
-
-    if (isMobileOrAPK) {
-      try {
-        await signInWithRedirect(auth, provider);
-      } catch (err: any) {
-        console.warn('signInWithRedirect failed, trying signInWithPopup:', err);
-        await signInWithPopup(auth, provider);
+    try {
+      // 1. Instant popup for fast account selection
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      // If user closed or cancelled popup, do nothing (don't hang or redirect)
+      if (
+        err?.code === 'auth/popup-closed-by-user' ||
+        err?.code === 'auth/cancelled-popup-request' ||
+        err?.code === 'auth/user-cancelled'
+      ) {
+        return;
       }
-    } else {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (err: any) {
-        console.warn('signInWithPopup failed, falling back to signInWithRedirect:', err);
+
+      // If popup was blocked by browser policy, fall back to redirect
+      if (err?.code === 'auth/popup-blocked') {
         await signInWithRedirect(auth, provider);
+      } else {
+        throw err;
       }
     }
   };

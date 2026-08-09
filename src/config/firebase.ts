@@ -6,18 +6,10 @@ import {
   persistentMultipleTabManager 
 } from 'firebase/firestore';
 
-// Get current domain for Same-Origin Firebase Auth Proxy to fix Chrome Storage Partitioning in APK/Mobile
-const getDynamicAuthDomain = () => {
-  if (typeof window !== 'undefined' && window.location.host) {
-    return window.location.host;
-  }
-  return "rw-milk-track.vercel.app";
-};
-
-// Actual Firebase Web App Configuration
+// Official Firebase Web App Configuration
 export const firebaseConfig = {
   apiKey: "AIzaSyC6L6rrsK4QHTM7FaR5qmnzcCS4nI3ohLY",
-  authDomain: getDynamicAuthDomain(),
+  authDomain: "rw-milk-track.firebaseapp.com",
   projectId: "rw-milk-track",
   storageBucket: "rw-milk-track.firebasestorage.app",
   messagingSenderId: "953538760940",
