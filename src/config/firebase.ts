@@ -1,16 +1,23 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { 
-  getFirestore, 
   initializeFirestore, 
   persistentLocalCache, 
   persistentMultipleTabManager 
 } from 'firebase/firestore';
 
-// Actual Firebase Web App Configuration from firebase/keys
+// Get current domain for Same-Origin Firebase Auth Proxy to fix Chrome Storage Partitioning in APK/Mobile
+const getDynamicAuthDomain = () => {
+  if (typeof window !== 'undefined' && window.location.host) {
+    return window.location.host;
+  }
+  return "rw-milk-track.vercel.app";
+};
+
+// Actual Firebase Web App Configuration
 export const firebaseConfig = {
   apiKey: "AIzaSyC6L6rrsK4QHTM7FaR5qmnzcCS4nI3ohLY",
-  authDomain: "rw-milk-track.firebaseapp.com",
+  authDomain: getDynamicAuthDomain(),
   projectId: "rw-milk-track",
   storageBucket: "rw-milk-track.firebasestorage.app",
   messagingSenderId: "953538760940",

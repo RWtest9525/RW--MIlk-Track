@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/__/auth/:path*",
+      "destination": "https://rw-milk-track.firebaseapp.com/__/auth/:path*"
+    },
+    {
       "source": "/privacy.html",
       "destination": "/privacy.html"
     },
