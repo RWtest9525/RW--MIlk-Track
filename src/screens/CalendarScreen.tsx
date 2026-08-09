@@ -2,45 +2,26 @@ import React, { useState } from 'react';
 import { CalendarGrid } from '../components/calendar/CalendarGrid';
 import { EditDateModal } from '../components/calendar/EditDateModal';
 import { useMilk } from '../context/MilkContext';
-import { CheckCircle2, XCircle, PlusCircle, RotateCcw } from 'lucide-react';
+import { CheckCircle2, XCircle, PlusCircle } from 'lucide-react';
 
 export const CalendarScreen: React.FC = () => {
-  const { selectedMonth, clearMonthLogs } = useMilk();
+  const { selectedMonth } = useMilk();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [clearing, setClearing] = useState(false);
 
   const [yearStr, monthStr] = selectedMonth.split('-');
   const dateObj = new Date(parseInt(yearStr, 10), parseInt(monthStr, 10) - 1, 1);
   const monthName = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-  const handleClearAll = async () => {
-    if (window.confirm('Clear all logs for this month and reset all dates to 0 L?')) {
-      setClearing(true);
-      await clearMonthLogs();
-      setClearing(false);
-    }
-  };
-
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto">
-      {/* Header Info with Reset Button */}
-      <div className="flex items-center justify-between gap-2">
+      {/* Header Info */}
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-black text-slate-900">{monthName} Calendar</h2>
           <p className="text-xs font-semibold text-slate-500 mt-0.5">
             Tap any date card to record or edit your daily milk delivery
           </p>
         </div>
-
-        <button
-          onClick={handleClearAll}
-          disabled={clearing}
-          className="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-600 text-xs font-extrabold px-3 py-1.5 rounded-2xl transition-all cursor-pointer shadow-2xs shrink-0"
-          title="Reset all month logs to 0 L"
-        >
-          <RotateCcw size={14} className={clearing ? 'animate-spin' : ''} />
-          <span className="hidden sm:inline">Reset to 0 L</span>
-        </button>
       </div>
 
       {/* Legend Chips (Delivered, Missed, Custom Qty) */}
