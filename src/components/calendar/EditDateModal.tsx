@@ -20,7 +20,7 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
   const { logs, updateDateLog } = useMilk();
   const { user } = useAuth();
 
-  const defaultQty = user?.vendor.defaultDailyQuantity ?? 1.5;
+  const defaultQty = user?.vendor?.defaultDailyQuantity ?? 1.5;
 
   const [status, setStatus] = useState<DeliveryStatus>('delivered');
   const [quantity, setQuantity] = useState<number>(defaultQty);
@@ -64,13 +64,13 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
     <BottomModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edit Daily Delivery"
+      title="Record Daily Delivery"
       subtitle={formatDateTitle(dateStr)}
     >
-      <div className="space-y-5">
+      <div className="space-y-5 text-slate-900">
         {/* Status Selection Chips */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-2">
             Select Delivery Status
           </label>
 
@@ -82,15 +82,15 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
                 setStatus('delivered');
                 setQuantity(defaultQty);
               }}
-              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all ${
+              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                 status === 'delivered'
-                  ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-lg shadow-emerald-950/50 scale-[1.02]'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm font-extrabold scale-[1.02]'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <CheckCircle2 size={20} className={status === 'delivered' ? 'text-emerald-400' : 'text-slate-500'} />
+              <CheckCircle2 size={20} className={status === 'delivered' ? 'text-emerald-600' : 'text-slate-400'} />
               <span className="text-xs font-bold mt-1.5">Delivered</span>
-              <span className="text-[10px] opacity-75 mt-0.5">{defaultQty} Litres</span>
+              <span className="text-[10px] text-slate-500 mt-0.5">{defaultQty} Litres</span>
             </button>
 
             {/* Missed Chip */}
@@ -100,15 +100,15 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
                 setStatus('missed');
                 setQuantity(0);
               }}
-              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all ${
+              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                 status === 'missed'
-                  ? 'bg-rose-500/20 border-rose-400 text-rose-300 shadow-lg shadow-rose-950/50 scale-[1.02]'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-rose-50 border-rose-500 text-rose-900 shadow-sm font-extrabold scale-[1.02]'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <XCircle size={20} className={status === 'missed' ? 'text-rose-400' : 'text-slate-500'} />
+              <XCircle size={20} className={status === 'missed' ? 'text-rose-600' : 'text-slate-400'} />
               <span className="text-xs font-bold mt-1.5">Missed</span>
-              <span className="text-[10px] opacity-75 mt-0.5">0 Litres</span>
+              <span className="text-[10px] text-slate-500 mt-0.5">0 Litres</span>
             </button>
 
             {/* Custom Chip */}
@@ -117,25 +117,25 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
               onClick={() => {
                 setStatus('custom');
               }}
-              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all ${
+              className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
                 status === 'custom'
-                  ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-lg shadow-amber-950/50 scale-[1.02]'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-amber-50 border-amber-500 text-amber-900 shadow-sm font-extrabold scale-[1.02]'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <PlusCircle size={20} className={status === 'custom' ? 'text-amber-400' : 'text-slate-500'} />
+              <PlusCircle size={20} className={status === 'custom' ? 'text-amber-600' : 'text-slate-400'} />
               <span className="text-xs font-bold mt-1.5">Custom</span>
-              <span className="text-[10px] opacity-75 mt-0.5">Extra / Custom</span>
+              <span className="text-[10px] text-slate-500 mt-0.5">Extra Qty</span>
             </button>
           </div>
         </div>
 
         {/* Quantity Controls (If Delivered or Custom) */}
         {status !== 'missed' && (
-          <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-2xl space-y-3">
+          <div className="bg-slate-50 border border-slate-200 p-4 rounded-2xl space-y-3">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-300">Quantity (Litres)</label>
-              <span className="text-lg font-black text-cyan-300">{quantity.toFixed(1)} L</span>
+              <label className="text-xs font-extrabold text-slate-700">Quantity (Litres)</label>
+              <span className="text-lg font-black text-[#0284C7]">{quantity.toFixed(1)} L</span>
             </div>
 
             {/* Presets */}
@@ -148,10 +148,10 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
                     setQuantity(preset);
                     if (preset !== defaultQty) setStatus('custom');
                   }}
-                  className={`flex-1 py-1.5 text-xs font-bold rounded-xl border transition-all ${
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
                     quantity === preset
-                      ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
-                      : 'bg-slate-800/60 border-slate-700 text-slate-300 hover:border-slate-600'
+                      ? 'bg-cyan-50 border-[#0284C7] text-[#0284C7] font-black'
+                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
                   }`}
                 >
                   {preset}L
@@ -171,23 +171,23 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
                 setQuantity(val);
                 if (val !== defaultQty) setStatus('custom');
               }}
-              className="w-full accent-cyan-400 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none"
+              className="w-full accent-[#0284C7] cursor-pointer h-2 bg-slate-200 rounded-lg appearance-none"
             />
           </div>
         )}
 
         {/* Optional Notes */}
         <div>
-          <label className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-            <MessageSquare size={13} className="text-cyan-400" />
-            Delivery Note / Override Reason
+          <label className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 mb-2">
+            <MessageSquare size={13} className="text-[#0284C7]" />
+            Delivery Note / Reason (Optional)
           </label>
           <input
             type="text"
-            placeholder="e.g. Out of town, Extra guests visiting..."
+            placeholder="e.g. Out of town, Extra milk..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-900/90 border border-slate-800 rounded-2xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50"
+            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
           />
         </div>
 
@@ -195,12 +195,12 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
         <GlassButton
           variant="primary"
           size="lg"
-          className="w-full"
+          className="w-full font-black py-3.5 shadow-md shadow-cyan-500/20"
           icon={<Save size={18} />}
           loading={loading}
           onClick={handleSave}
         >
-          Save & Update Calendar
+          Save & Update Log
         </GlassButton>
       </div>
     </BottomModal>

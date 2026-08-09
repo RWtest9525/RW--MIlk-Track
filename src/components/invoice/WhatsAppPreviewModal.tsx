@@ -41,13 +41,13 @@ export const WhatsAppPreviewModal: React.FC<WhatsAppPreviewModalProps> = ({ isOp
       isOpen={isOpen}
       onClose={onClose}
       title="WhatsApp Invoice Preview"
-      subtitle={`Send statement to ${user.vendor.name} (${user.vendor.countryCode} ${user.vendor.phone})`}
+      subtitle={`Send to ${user.vendor.name} (${user.vendor.countryCode} ${user.vendor.phone})`}
     >
-      <div className="space-y-4">
-        {/* Live Message Container Box */}
-        <div className="bg-[#0B141A] border border-emerald-500/30 rounded-2xl p-4 font-mono text-[11px] leading-relaxed text-slate-200 whitespace-pre-wrap max-h-60 overflow-y-auto shadow-inner relative">
-          <div className="absolute top-2 right-2 bg-emerald-500/20 text-emerald-300 text-[9px] font-sans font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
-            WhatsApp Format
+      <div className="space-y-4 text-slate-900">
+        {/* Light Theme Message Container Box */}
+        <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 font-mono text-[11px] leading-relaxed text-emerald-950 whitespace-pre-wrap max-h-60 overflow-y-auto shadow-inner relative">
+          <div className="absolute top-2 right-2 bg-emerald-100 text-emerald-800 text-[9px] font-sans font-extrabold px-2 py-0.5 rounded-full border border-emerald-300">
+            WhatsApp Text
           </div>
           {formattedMessage}
         </div>
@@ -57,8 +57,8 @@ export const WhatsAppPreviewModal: React.FC<WhatsAppPreviewModalProps> = ({ isOp
           <GlassButton
             variant="secondary"
             size="md"
-            className="flex-1"
-            icon={copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+            className="flex-1 font-extrabold"
+            icon={copied ? <Check size={16} className="text-emerald-600" /> : <Copy size={16} />}
             onClick={handleCopy}
           >
             {copied ? 'Copied!' : 'Copy Text'}
@@ -67,11 +67,11 @@ export const WhatsAppPreviewModal: React.FC<WhatsAppPreviewModalProps> = ({ isOp
           <GlassButton
             variant="success"
             size="md"
-            className="flex-[2]"
+            className="flex-[2] font-black shadow-md shadow-emerald-500/20"
             icon={<ExternalLink size={16} />}
             onClick={handleSendWhatsApp}
           >
-            Open WhatsApp Direct Chat
+            Open WhatsApp Chat
           </GlassButton>
         </div>
       </div>
