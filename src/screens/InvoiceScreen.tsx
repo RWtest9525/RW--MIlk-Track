@@ -5,25 +5,37 @@ import { WhatsAppPreviewModal } from '../components/invoice/WhatsAppPreviewModal
 import { PaymentLedgerModal } from '../components/invoice/PaymentLedgerModal';
 import { GlassButton } from '../components/common/GlassButton';
 import { Badge } from '../components/common/Badge';
-import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText } from 'lucide-react';
+import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText, Search, SlidersHorizontal, X, Check } from 'lucide-react';
 
-const MONTH_LIST = [
-  { key: '2026-08', label: 'AUGUST 2026' },
-  { key: '2026-07', label: 'JULY 2026' },
-  { key: '2026-06', label: 'JUNE 2026' },
-  { key: '2026-05', label: 'MAY 2026' },
-  { key: '2026-04', label: 'APRIL 2026' },
-  { key: '2026-03', label: 'MARCH 2026' },
-  { key: '2026-02', label: 'FEBRUARY 2026' },
-  { key: '2026-01', label: 'JANUARY 2026' },
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const FULL_MONTH_LIST = [
+  { key: '2026-08', label: 'AUGUST 2026', monthName: 'August', yearName: '2026' },
+  { key: '2026-07', label: 'JULY 2026', monthName: 'July', yearName: '2026' },
+  { key: '2026-06', label: 'JUNE 2026', monthName: 'June', yearName: '2026' },
+  { key: '2026-05', label: 'MAY 2026', monthName: 'May', yearName: '2026' },
+  { key: '2026-04', label: 'APRIL 2026', monthName: 'April', yearName: '2026' },
+  { key: '2026-03', label: 'MARCH 2026', monthName: 'March', yearName: '2026' },
+  { key: '2026-02', label: 'FEBRUARY 2026', monthName: 'February', yearName: '2026' },
+  { key: '2026-01', label: 'JANUARY 2026', monthName: 'January', yearName: '2026' },
 ];
 
 export const InvoiceScreen: React.FC = () => {
   const { invoice, setSelectedMonth, selectedMonth } = useMilk();
   const { user } = useAuth();
 
-  // Selected Month Card Detail View: null (shows month cards) | monthKey string (e.g. '2026-01')
+  // Detail View State: null (shows month cards) | monthKey string (e.g. '2026-01')
   const [activeMonthCard, setActiveMonthCard] = useState<string | null>(null);
+
+  // Search & Filter States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filterMonth, setFilterMonth] = useState<string>('all');
+  const [filterYear, setFilterYear] = useState<string>('all');
+  const [activeFilterLabel, setActiveFilterLabel] = useState<string | null>(null);
 
   // Modals
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
@@ -38,12 +50,41 @@ export const InvoiceScreen: React.FC = () => {
     window.print();
   };
 
+  const handleApplyFilter = () => {
+    let labelParts = [];
+    if (filterMonth !== 'all') labelParts.push(filterMonth);
+    if (filterYear !== 'all') labelParts.push(filterYear);
+
+    if (labelParts.length > 0) {
+      setActiveFilterLabel(labelParts.join(' '));
+    } else {
+      setActiveFilterLabel(null);
+    }
+
+    setFilterModalOpen(false);
+  };
+
+  const handleClearFilter = () => {
+    setFilterMonth('all');
+    setFilterYear('all');
+    setActiveFilterLabel(null);
+    setSearchQuery('');
+  };
+
+  // Filtered month list based on Search query & Filter Drawer settings
+  const filteredMonthList = FULL_MONTH_LIST.filter((m) => {
+    const matchesSearch = searchQuery === '' || m.label.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMonth = filterMonth === 'all' || m.monthName.toLowerCase() === filterMonth.toLowerCase();
+    const matchesYear = filterYear === 'all' || m.yearName === filterYear;
+    return matchesSearch && matchesMonth && matchesYear;
+  });
+
   const defaultPrice = user?.vendor?.defaultPricePerLitre ?? 60;
   const defaultDaily = user?.vendor?.defaultDailyQuantity ?? 1.5;
 
   // 1. FULL PREMIUM INVOICE & PDF VIEW (When a Month Card is clicked)
   if (activeMonthCard) {
-    const selectedMonthLabel = MONTH_LIST.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
+    const selectedMonthLabel = FULL_MONTH_LIST.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
 
     return (
       <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0">
@@ -191,7 +232,7 @@ export const InvoiceScreen: React.FC = () => {
     );
   }
 
-  // 2. MAIN MONTHLY CARDS LIST VIEW WITH DISTINCT BORDERS
+  // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & FILTER MODAL
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto">
       
@@ -203,52 +244,179 @@ export const InvoiceScreen: React.FC = () => {
         </p>
       </div>
 
-      {/* Monthly Cards List Grid with Sharp Distinct Borders */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {MONTH_LIST.map((m) => {
-          return (
-            <div
-              key={m.key}
-              onClick={() => handleSelectMonthCard(m.key)}
-              className="bg-white hover:bg-slate-50 border-2 border-slate-200/90 hover:border-[#0284C7] rounded-3xl p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group space-y-3 relative overflow-hidden"
+      {/* Search Input Bar + Filter Button */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search month or year (e.g. January 2026)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7] shadow-xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-[#0284C7] shrink-0 group-hover:scale-105 transition-transform">
-                    <FileText size={19} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors">
-                      {m.label}
-                    </h3>
-                    <span className="text-[10px] font-bold text-slate-400">Monthly Statement</span>
-                  </div>
-                </div>
+              <X size={14} />
+            </button>
+          )}
+        </div>
 
-                <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
-              </div>
-
-              {/* Card Footer Info */}
-              <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Est. Rate</span>
-                  <span className="font-extrabold text-slate-900">₹{defaultPrice}/L</span>
-                </div>
-
-                <div>
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">Default Qty</span>
-                  <span className="font-extrabold text-slate-900">{defaultDaily} L/Day</span>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-[10px] text-slate-400 font-bold block uppercase">View Bill</span>
-                  <span className="font-black text-[#0284C7] text-xs">View Invoice →</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {/* Interactive Filter Button */}
+        <button
+          onClick={() => setFilterModalOpen(true)}
+          className={`p-2.5 rounded-2xl border flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer shadow-xs ${
+            activeFilterLabel
+              ? 'bg-cyan-50 border-[#0284C7] text-[#0284C7]'
+              : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          <SlidersHorizontal size={16} />
+          <span className="hidden sm:inline">Filter</span>
+        </button>
       </div>
+
+      {/* Active Filter Pill Bar */}
+      {(activeFilterLabel || searchQuery) && (
+        <div className="flex items-center justify-between bg-cyan-50 border border-cyan-200 rounded-2xl px-3.5 py-2 text-xs font-bold text-[#0284C7]">
+          <span>
+            Active Filter: <strong>{activeFilterLabel || searchQuery}</strong>
+          </span>
+          <button
+            onClick={handleClearFilter}
+            className="text-cyan-800 hover:text-cyan-950 font-black text-xs underline flex items-center gap-1 cursor-pointer"
+          >
+            <X size={13} /> Clear
+          </button>
+        </div>
+      )}
+
+      {/* Monthly Cards List Grid */}
+      {filteredMonthList.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 text-center text-xs font-semibold text-slate-500 space-y-2">
+          <p>No month invoices match your search or filter.</p>
+          <button
+            onClick={handleClearFilter}
+            className="text-[#0284C7] font-bold hover:underline"
+          >
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {filteredMonthList.map((m) => {
+            return (
+              <div
+                key={m.key}
+                onClick={() => handleSelectMonthCard(m.key)}
+                className="bg-white hover:bg-slate-50 border-2 border-slate-200/90 hover:border-[#0284C7] rounded-3xl p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group space-y-3 relative overflow-hidden"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-[#0284C7] shrink-0 group-hover:scale-105 transition-transform">
+                      <FileText size={19} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors">
+                        {m.label}
+                      </h3>
+                      <span className="text-[10px] font-bold text-slate-400">Monthly Statement</span>
+                    </div>
+                  </div>
+
+                  <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+
+                {/* Card Footer Info */}
+                <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block uppercase">Est. Rate</span>
+                    <span className="font-extrabold text-slate-900">₹{defaultPrice}/L</span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] text-slate-400 font-bold block uppercase">Default Qty</span>
+                    <span className="font-extrabold text-slate-900">{defaultDaily} L/Day</span>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-[10px] text-slate-400 font-bold block uppercase">View Bill</span>
+                    <span className="font-black text-[#0284C7] text-xs">View Invoice →</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* FILTER DRAWER MODAL */}
+      {filterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 w-full max-w-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 font-black text-slate-900 text-sm">
+                <SlidersHorizontal size={18} className="text-[#0284C7]" />
+                <span>Filter Month Invoices</span>
+              </div>
+              <button
+                onClick={() => setFilterModalOpen(false)}
+                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Select Month */}
+            <div>
+              <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-600">Select Month</label>
+              <select
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+              >
+                <option value="all">All Months</option>
+                {MONTH_NAMES.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Select Year */}
+            <div>
+              <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-600">Select Year</label>
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+              >
+                <option value="all">All Years</option>
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+              </select>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={handleClearFilter}
+                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-xs font-bold"
+              >
+                Reset
+              </button>
+              <button
+                onClick={handleApplyFilter}
+                className="flex-1 py-2.5 bg-[#0284C7] hover:bg-[#0369A1] text-white rounded-2xl text-xs font-black shadow-md flex items-center justify-center gap-1.5"
+              >
+                <Check size={16} /> Apply Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

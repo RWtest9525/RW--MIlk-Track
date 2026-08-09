@@ -57,7 +57,7 @@ export const AppContainer: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex flex-col relative bg-[#F8FAFC] text-slate-900">
       {/* Top Navbar */}
-      <Header />
+      <Header activeTab={activeTab} />
 
       {/* Main Content Viewport */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8">

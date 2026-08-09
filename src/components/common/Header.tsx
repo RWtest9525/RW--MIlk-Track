@@ -2,13 +2,14 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useMilk } from '../../context/MilkContext';
 import { ChevronDown, Store, Calendar as CalendarIcon } from 'lucide-react';
+import { ActiveTab } from '../../types';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-export const Header: React.FC = () => {
+export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashboard' }) => {
   const { user } = useAuth();
   const { selectedMonth, setSelectedMonth } = useMilk();
 
@@ -25,15 +26,39 @@ export const Header: React.FC = () => {
     monthOptions.push({ key, label });
   }
 
+  // NON-DASHBOARD VIEWS: Compact brand header (no user/vendor avatar or month filter pill)
+  if (activeTab !== 'dashboard') {
+    return (
+      <header className="px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <img
+              src="/logo.png"
+              alt="RW-Milk Tracker"
+              className="w-8 h-8 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0"
+            />
+            <span className="text-sm font-black tracking-tight text-slate-900">
+              RW-Milk Tracker
+            </span>
+          </div>
+          <span className="text-[10px] font-extrabold text-[#0284C7] bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded-full uppercase">
+            {activeTab}
+          </span>
+        </div>
+      </header>
+    );
+  }
+
+  // DASHBOARD VIEW ONLY: User Avatar, Name, Vendor Name & Month Selector Pill
   return (
-    <header className="px-4 sm:px-6 pt-3.5 pb-3 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
+    <header className="px-4 sm:px-6 pt-3 pb-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
       <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
         {/* User Avatar Info & App Logo */}
         <div className="flex items-center gap-3">
           <img
             src={user?.photoURL || '/logo.png'}
             alt="User Avatar"
-            className="w-10 h-10 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0"
+            className="w-10 h-10 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
           />
 
           <div>
@@ -43,16 +68,16 @@ export const Header: React.FC = () => {
               </h1>
             </div>
             
-            <div className="flex items-center gap-1 text-[11px] text-cyan-600 font-bold mt-0.5">
-              <Store size={12} className="text-cyan-600" />
+            <div className="flex items-center gap-1 text-[11px] text-cyan-700 font-bold mt-0.5">
+              <Store size={12} className="text-[#0284C7]" />
               <span className="truncate max-w-[140px]">{user?.vendor?.name || 'Dairy Vendor'}</span>
             </div>
           </div>
         </div>
 
-        {/* Right Control: Month Selector Pill */}
+        {/* Month Selector Pill */}
         <div className="relative inline-flex items-center border border-slate-300 bg-slate-50 rounded-2xl px-3 py-1.5 text-xs font-bold text-slate-800 shadow-2xs">
-          <CalendarIcon size={14} className="text-cyan-600 mr-1.5" />
+          <CalendarIcon size={14} className="text-[#0284C7] mr-1.5" />
           <select
             value={selectedMonth}
             onChange={handleMonthChange}

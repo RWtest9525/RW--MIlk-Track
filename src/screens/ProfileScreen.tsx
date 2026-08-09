@@ -1,21 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { LegalModal, LegalType } from '../components/common/LegalModal';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Trash2, Camera, Sparkles } from 'lucide-react';
-
-const PRESET_AVATARS = [
-  '/logo.png',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80',
-];
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Trash2, Camera } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Navigation sub-views: null (main menu) | 'profile_page' | 'vendor_page' | 'delete_page'
   const [subView, setSubView] = useState<'profile_page' | 'vendor_page' | 'delete_page' | null>(null);
@@ -23,7 +15,6 @@ export const ProfileScreen: React.FC = () => {
   // Profile Form States
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || '/logo.png');
 
   // Vendor Form States
   const [vendorName, setVendorName] = useState(user?.vendor?.name || '');
@@ -38,9 +29,22 @@ export const ProfileScreen: React.FC = () => {
   // Legal Modal
   const [legalModalType, setLegalModalType] = useState<LegalType | null>(null);
 
+  // Gallery Photo Picker Trigger
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Photo = reader.result as string;
+        await updateUserProfile(user?.name || '', user?.phone || '', base64Photo);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateUserProfile(name, phone, selectedAvatar);
+    await updateUserProfile(name, phone);
     setSavedUser(true);
     setTimeout(() => setSavedUser(false), 2000);
   };
@@ -85,7 +89,7 @@ export const ProfileScreen: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-black text-slate-900">My Profile Settings</h2>
-                <p className="text-xs font-semibold text-slate-500">Update name, phone number & avatar photo</p>
+                <p className="text-xs font-semibold text-slate-500">Update full name & mobile number</p>
               </div>
             </div>
             {savedUser && (
@@ -93,25 +97,6 @@ export const ProfileScreen: React.FC = () => {
                 <CheckCircle size={15} /> Saved!
               </span>
             )}
-          </div>
-
-          {/* Avatar Selector */}
-          <div>
-            <label className="block text-[11px] font-extrabold uppercase mb-2 text-slate-700">Choose Profile Picture</label>
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 custom-scrollbar">
-              {PRESET_AVATARS.map((url, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setSelectedAvatar(url)}
-                  className={`w-14 h-14 rounded-full border-2 overflow-hidden shrink-0 transition-transform cursor-pointer ${
-                    selectedAvatar === url ? 'border-[#0284C7] scale-110 shadow-md ring-2 ring-cyan-200' : 'border-slate-200 opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <img src={url} alt="Avatar" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
           </div>
 
           <div>
@@ -253,25 +238,51 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 4. MAIN SETTINGS MENU VIEW (ALL BUTTONS COLLAPSED BY DEFAULT)
+  // 4. MAIN SETTINGS MENU VIEW WITH DIRECT AVATAR GALLERY PICKER ON TOP CARD
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
       
-      {/* User Header Profile Card */}
+      {/* Hidden Gallery Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handlePhotoUpload}
+        className="hidden"
+      />
+
+      {/* User Header Profile Card with Direct Gallery Photo Chooser */}
       <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex items-center gap-4">
-        <div className="relative">
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="relative group cursor-pointer shrink-0"
+          title="Click to choose profile photo from gallery"
+        >
           <img
             src={user?.photoURL || '/logo.png'}
             alt="User Profile"
-            className="w-16 h-16 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
+            className="w-16 h-16 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 group-hover:brightness-90 transition-all"
           />
-          <span className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full" />
+          <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera size={18} />
+          </div>
+          <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border border-white shadow-sm">
+            <Camera size={10} />
+          </span>
         </div>
 
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-black text-slate-900 truncate">
-            {user?.name || 'Customer Profile'}
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-black text-slate-900 truncate">
+              {user?.name || 'Customer Profile'}
+            </h2>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="text-[10px] font-black text-[#0284C7] hover:underline cursor-pointer"
+            >
+              Change Photo
+            </button>
+          </div>
           <p className="text-xs font-semibold text-slate-500 truncate">
             {user?.phone || 'Mobile not set'} • {user?.email || 'Email user'}
           </p>
@@ -297,7 +308,7 @@ export const ProfileScreen: React.FC = () => {
             </div>
             <div className="text-left">
               <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors">My Profile Settings</h3>
-              <p className="text-[11px] font-semibold text-slate-500">Edit full name, phone number & profile photo</p>
+              <p className="text-[11px] font-semibold text-slate-500">Edit full name & mobile number</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
