@@ -111,29 +111,32 @@ export const InvoiceScreen: React.FC = () => {
         {/* Printable Detailed Invoice Document */}
         <div className="bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-8 shadow-xl space-y-5 text-slate-900 print:shadow-none print:border-none print:rounded-none print:p-2">
           
-          {/* Invoice Header: Clean 1-Line Title & Right Badge */}
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <img
-                  src="/logo.png"
-                  alt="RW-Milk Tracker"
-                  className="w-12 h-12 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
-                />
-                <div>
-                  <h1 className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
-                    RW-Milk Tracker Invoice
-                  </h1>
-                  <p className="text-xs font-extrabold text-[#0284C7]">{selectedMonthLabel}</p>
-                </div>
+          {/* Invoice Header: Top 1-Line Title & Row 2 Month / Right Badge */}
+          <div className="space-y-2.5">
+            {/* Row 1: Logo & Title on 1 Single Line */}
+            <div className="flex items-center gap-2.5 pb-1">
+              <img
+                src="/logo.png"
+                alt="RW-Milk Tracker"
+                className="w-10 h-10 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 shrink-0"
+              />
+              <h1 className="text-sm sm:text-lg font-black text-slate-900 tracking-tight whitespace-nowrap">
+                RW-Milk Tracker Invoice
+              </h1>
+            </div>
+
+            {/* Row 2: Month & ID on Left, Unpaid Dues Badge on Right */}
+            <div className="flex items-center justify-between pt-1">
+              <div>
+                <p className="text-xs font-black uppercase text-[#0284C7] tracking-wider">{selectedMonthLabel}</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-0.5">Invoice ID: INV-{activeMonthCard.replace('-', '')}</p>
               </div>
 
-              {/* Status Badge & Issued Date Right Aligned */}
               <div className="text-right shrink-0">
                 <Badge variant={invoice.status === 'paid' ? 'paid' : invoice.status === 'partial' ? 'custom' : 'unpaid'}>
                   {invoice.status === 'paid' ? 'Paid' : invoice.status === 'partial' ? 'Partial Due' : 'Unpaid Dues'}
                 </Badge>
-                <p className="text-[10px] font-bold text-slate-500 mt-1">Issued: {formatDateDDMMYYYY()}</p>
+                <p className="text-[10px] font-extrabold text-slate-500 mt-1">Issued: {formatDateDDMMYYYY()}</p>
               </div>
             </div>
 
