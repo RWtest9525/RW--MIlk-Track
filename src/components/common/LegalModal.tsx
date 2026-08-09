@@ -86,7 +86,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ isOpen, type, onClose })
   const current = content[type];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 max-h-[85vh] flex flex-col">
         
         {/* Header */}
