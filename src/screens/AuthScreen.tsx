@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GlassButton } from '../components/common/GlassButton';
+import { LegalModal, LegalType } from '../components/common/LegalModal';
 import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, User, LogIn, UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -13,6 +14,9 @@ export const AuthScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Legal Modal State
+  const [legalModalType, setLegalModalType] = useState<LegalType | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,10 +53,12 @@ export const AuthScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-[#F8FAFC] text-slate-900 relative">
+    <div className="min-h-screen w-full flex flex-col justify-between items-center p-4 sm:p-6 bg-[#F8FAFC] text-slate-900 relative">
       
+      <div />
+
       {/* Clean Centered Login Card */}
-      <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in">
+      <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in my-auto">
         
         {/* Flush Circular Logo Header */}
         <div className="text-center space-y-3">
@@ -227,6 +233,38 @@ export const AuthScreen: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* Play Store Compliant Legal Footer Links */}
+      <footer className="py-4 text-center z-10">
+        <div className="flex items-center justify-center gap-3 text-[11px] font-bold text-slate-500">
+          <button
+            onClick={() => setLegalModalType('terms')}
+            className="hover:text-[#0284C7] hover:underline transition-colors"
+          >
+            Terms & Conditions
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setLegalModalType('privacy')}
+            className="hover:text-[#0284C7] hover:underline transition-colors"
+          >
+            Privacy Policy
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => setLegalModalType('about')}
+            className="hover:text-[#0284C7] hover:underline transition-colors"
+          >
+            About Us
+          </button>
+        </div>
+      </footer>
+
+      {/* Play Store Legal Document Modal */}
+      <LegalModal
+        type={legalModalType}
+        onClose={() => setLegalModalType(null)}
+      />
     </div>
   );
 };
