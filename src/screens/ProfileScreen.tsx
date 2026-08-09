@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
@@ -17,7 +17,7 @@ export const ProfileScreen: React.FC = () => {
   const [phone, setPhone] = useState(user?.phone || '');
 
   // Vendor Form States
-  const [vendorName, setVendorName] = useState(user?.vendor?.name || '');
+  const [vendorName, setVendorName] = useState(user?.vendor?.name || 'Amul Milk Express');
   const [vendorPhone, setVendorPhone] = useState(user?.vendor?.phone || '');
   const [pricePerLitre, setPricePerLitre] = useState(user?.vendor?.defaultPricePerLitre || 60);
   const [defaultQty, setDefaultQty] = useState(user?.vendor?.defaultDailyQuantity || 1.5);
@@ -25,6 +25,21 @@ export const ProfileScreen: React.FC = () => {
 
   const [savedUser, setSavedUser] = useState(false);
   const [savedVendor, setSavedVendor] = useState(false);
+
+  // Sync state when user object updates
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setPhone(user.phone || '');
+      if (user.vendor) {
+        setVendorName(user.vendor.name || 'Amul Milk Express');
+        setVendorPhone(user.vendor.phone || '');
+        setPricePerLitre(user.vendor.defaultPricePerLitre || 60);
+        setDefaultQty(user.vendor.defaultDailyQuantity || 1.5);
+        setPreferredSlot(user.vendor.preferredSlot || 'morning');
+      }
+    }
+  }, [user]);
 
   // Gallery Photo Picker Trigger
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,9 +65,9 @@ export const ProfileScreen: React.FC = () => {
     e.preventDefault();
     if (!user) return;
     await updateVendorProfile({
-      ...user.vendor,
       name: vendorName,
       phone: vendorPhone,
+      countryCode: user.vendor?.countryCode || '+91',
       defaultPricePerLitre: Number(pricePerLitre),
       defaultDailyQuantity: Number(defaultQty),
       preferredSlot,
