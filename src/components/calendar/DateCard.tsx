@@ -43,22 +43,22 @@ export const DateCard: React.FC<DateCardProps> = ({
     if (status === 'custom') {
       return 'bg-amber-50 border-amber-300 text-amber-950 shadow-xs hover:border-amber-500';
     }
-    // Delivered (user manually logged)
+    // Delivered
     return 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-xs hover:border-emerald-500';
   };
 
   const getBadgeIcon = () => {
     if (isDisabled) return null;
     if (isUnlogged) {
-      return <Plus size={12} className="text-slate-400 font-extrabold" />;
+      return <Plus size={11} className="text-slate-400 font-bold" />;
     }
     if (status === 'missed') {
-      return <X size={12} className="text-rose-700 font-black stroke-[3]" />;
+      return <X size={11} className="text-rose-700 font-black stroke-[3]" />;
     }
     if (status === 'custom') {
-      return <Plus size={12} className="text-amber-700 font-black stroke-[3]" />;
+      return <Plus size={11} className="text-amber-700 font-black stroke-[3]" />;
     }
-    return <Check size={12} className="text-emerald-700 font-black stroke-[3]" />;
+    return <Check size={11} className="text-emerald-700 font-black stroke-[3]" />;
   };
 
   return (
@@ -66,59 +66,50 @@ export const DateCard: React.FC<DateCardProps> = ({
       onClick={() => {
         if (!isDisabled) onSelectDate();
       }}
-      className={`relative rounded-2xl p-2 sm:p-2.5 flex flex-col justify-between h-20 transition-all duration-200 border cursor-pointer select-none active:scale-95 group ${getCardStyle()}`}
+      className={`relative rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 flex flex-col justify-between h-16 sm:h-20 transition-all duration-200 border cursor-pointer select-none active:scale-95 group ${getCardStyle()}`}
     >
       {/* Today Indicator Pill */}
       {isToday && (
-        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#0284C7] text-white text-[9px] font-black uppercase px-2 py-0.2 rounded-full shadow-sm z-10">
+        <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-[#0284C7] text-white text-[8px] sm:text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full shadow-xs z-10 whitespace-nowrap">
           Today
         </span>
       )}
 
       {/* Date Number Header */}
       <div className="flex items-center justify-between">
-        <span className={`text-xs sm:text-sm font-black ${isToday ? 'text-[#0284C7]' : 'text-slate-900'}`}>
+        <span className={`text-xs sm:text-sm font-black leading-none ${isToday ? 'text-[#0284C7]' : 'text-slate-900'}`}>
           {dayNumber}
         </span>
         {!isDisabled && (
-          <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-2xs">
+          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-2xs shrink-0">
             {getBadgeIcon()}
           </div>
         )}
       </div>
 
-      {/* Quantity & Notes Footer */}
-      <div className="mt-auto">
+      {/* Quantity Footer (Horizontal Clean Rendering) */}
+      <div className="mt-auto flex items-center justify-center text-center">
         {isBeforeRegistration ? (
-          <span className="text-[9px] text-slate-400 font-bold block">Before Join</span>
+          <span className="text-[8px] sm:text-[9px] text-slate-400 font-bold">Join</span>
         ) : isFuture ? (
-          <span className="text-[10px] text-slate-400 font-medium">--</span>
+          <span className="text-[9px] sm:text-[10px] text-slate-400 font-medium">--</span>
         ) : isUnlogged ? (
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 font-bold">0 L</span>
-            <span className="text-[9px] text-[#0284C7] font-black opacity-0 group-hover:opacity-100 transition-opacity">+ Edit</span>
-          </div>
+          <span className="text-[9px] sm:text-[10px] text-slate-500 font-black">0 L</span>
         ) : (
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] sm:text-[11px] font-black tracking-tight">
-              {status === 'missed' ? (
-                <span className="text-rose-600">0 L</span>
-              ) : (
-                <span className="text-slate-900">{qty.toFixed(1)} L</span>
-              )}
-            </span>
-
-            {log?.notes && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7] animate-pulse" title={log.notes} />
+          <span className="text-[10px] sm:text-xs font-black tracking-tight whitespace-nowrap">
+            {status === 'missed' ? (
+              <span className="text-rose-600">0 L</span>
+            ) : (
+              <span className="text-slate-900">{qty.toFixed(1)}L</span>
             )}
-          </div>
+          </span>
         )}
       </div>
 
       {/* Hover Edit Icon hint */}
       {!isDisabled && (
-        <div className="absolute inset-0 bg-white/90 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <Edit2 size={16} className="text-[#0284C7]" />
+        <div className="absolute inset-0 bg-white/90 rounded-xl sm:rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <Edit2 size={15} className="text-[#0284C7]" />
         </div>
       )}
     </div>

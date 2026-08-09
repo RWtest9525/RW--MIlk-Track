@@ -12,7 +12,7 @@ import { EditDateModal } from './components/calendar/EditDateModal';
 import { WhatsAppPreviewModal } from './components/invoice/WhatsAppPreviewModal';
 import { PaymentLedgerModal } from './components/invoice/PaymentLedgerModal';
 import { ActiveTab } from './types';
-import { ShieldCheck, ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export const AppContainer: React.FC = () => {
   const { user, loading } = useAuth();
@@ -29,7 +29,7 @@ export const AppContainer: React.FC = () => {
   const isPrivacyRoute = pathname.includes('privacy') || search.includes('privacy');
   const isDeleteRoute = pathname.includes('delete-account') || search.includes('delete');
 
-  // 1. PUBLIC ROUTE: Privacy Policy (No Login Required for Play Store Reviewer)
+  // 1. PUBLIC ROUTE: Privacy Policy (No Login Required)
   if (isPrivacyRoute) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900 p-4 sm:p-8 animate-fade-in">
@@ -62,7 +62,7 @@ export const AppContainer: React.FC = () => {
     );
   }
 
-  // 2. PUBLIC ROUTE: Account Deletion Page (No Login Required for Play Store Reviewer)
+  // 2. PUBLIC ROUTE: Account Deletion Page (No Login Required)
   if (isDeleteRoute) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900 p-4 sm:p-8 animate-fade-in">
@@ -95,8 +95,17 @@ export const AppContainer: React.FC = () => {
     );
   }
 
-  // 3. If not logged in -> ALWAYS show Auth Screen (Sign In / Register)
-  if (!loading && !user) {
+  // 3. While Auth is checking initial token state -> Show minimal blank background (No Flash of Dashboard!)
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full bg-[#F8FAFC] flex items-center justify-center">
+        <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-full animate-pulse border-2 border-[#0284C7]" />
+      </div>
+    );
+  }
+
+  // 4. If not logged in -> Auth Screen (Sign In / Register)
+  if (!user) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <AuthScreen />
@@ -104,8 +113,8 @@ export const AppContainer: React.FC = () => {
     );
   }
 
-  // 4. If logged in but not onboarded -> Setup Screen
-  if (user && !user.isOnboarded) {
+  // 5. If logged in but not onboarded -> Setup Screen
+  if (!user.isOnboarded) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <OnboardingScreen />
@@ -117,12 +126,12 @@ export const AppContainer: React.FC = () => {
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   return (
-    <div className="min-h-screen w-full flex flex-col relative bg-[#F8FAFC] text-slate-900">
-      {/* Top Navbar */}
-      <Header activeTab={activeTab} />
+    <div className="min-h-screen w-full flex flex-col relative bg-[#F8FAFC] text-slate-900 pt-2">
+      {/* Top Navbar: ONLY ON DASHBOARD */}
+      {activeTab === 'dashboard' && <Header activeTab={activeTab} />}
 
       {/* Main Content Viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 pt-4">
         {activeTab === 'dashboard' && (
           <DashboardScreen
             onOpenTodayModal={() => setTodayModalOpen(true)}

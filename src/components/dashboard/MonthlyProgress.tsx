@@ -16,46 +16,46 @@ export const MonthlyProgress: React.FC = () => {
         </h3>
         <span className="text-xs text-emerald-700 font-extrabold flex items-center gap-1">
           <TrendingUp size={14} className="text-emerald-600" />
-          {deliveredPct}% Delivery Success Rate
+          {deliveredPct}% Delivery Success
         </span>
       </div>
 
-      {/* Visual Progress Multi-Bar */}
-      <div className="h-3.5 w-full bg-slate-200 rounded-full overflow-hidden p-0.5 border border-slate-300 flex">
+      {/* Sleek Thinner Progress Bar */}
+      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden flex">
         <div
           style={{ width: `${deliveredPct}%` }}
-          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 shadow-sm"
+          className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 shadow-2xs"
         />
         <div
           style={{ width: `${missedPct}%` }}
-          className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-500 shadow-sm"
+          className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full transition-all duration-500 shadow-2xs"
         />
       </div>
 
       {/* Grid Summary Cards */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5">
         {/* Delivered Days */}
-        <div className="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3.5 flex items-center gap-3 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
-            <CheckCircle2 size={20} />
+        <div className="bg-emerald-50/80 border border-emerald-200/90 rounded-2xl p-3 flex items-center gap-2.5 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
+            <CheckCircle2 size={18} />
           </div>
           <div>
-            <div className="text-xs text-emerald-900 font-extrabold">Delivered Days</div>
-            <div className="text-base font-black text-emerald-700 mt-0.5">
-              {invoice.deliveredDays} <span className="text-xs font-bold text-emerald-800">/ {invoice.totalDays} days</span>
+            <div className="text-[11px] text-emerald-900 font-extrabold">Delivered Days</div>
+            <div className="text-sm font-black text-emerald-700 mt-0.5">
+              {invoice.deliveredDays} <span className="text-[10px] font-bold text-emerald-800">/ {invoice.totalDays}</span>
             </div>
           </div>
         </div>
 
         {/* Missed Days */}
-        <div className="bg-rose-50 border border-rose-200/90 rounded-2xl p-3.5 flex items-center gap-3 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-700 shrink-0">
-            <XCircle size={20} />
+        <div className="bg-rose-50/80 border border-rose-200/90 rounded-2xl p-3 flex items-center gap-2.5 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-700 shrink-0">
+            <XCircle size={18} />
           </div>
           <div>
-            <div className="text-xs text-rose-900 font-extrabold">Missed Days</div>
-            <div className="text-base font-black text-rose-700 mt-0.5">
-              {invoice.missedDays} <span className="text-xs font-bold text-rose-800">days</span>
+            <div className="text-[11px] text-rose-900 font-extrabold">Missed Days</div>
+            <div className="text-sm font-black text-rose-700 mt-0.5">
+              {invoice.missedDays} <span className="text-[10px] font-bold text-rose-800">days</span>
             </div>
           </div>
         </div>

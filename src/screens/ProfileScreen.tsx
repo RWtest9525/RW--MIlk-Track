@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
 import { formatDateDDMMYYYY } from '../utils/dateUtils';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2, CheckCircle2 } from 'lucide-react';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
@@ -12,15 +12,22 @@ export const ProfileScreen: React.FC = () => {
   // Navigation sub-views: null (main menu) | 'profile_page' | 'vendor_page' | 'delete_page' | 'terms_page' | 'privacy_page' | 'about_page'
   const [subView, setSubView] = useState<'profile_page' | 'vendor_page' | 'delete_page' | 'terms_page' | 'privacy_page' | 'about_page' | null>(null);
 
+  // Sign Out Confirmation Modal state
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState<boolean>(false);
+
   // Profile Form States
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
 
-  // Vendor Form States
+  // Vendor Form States (String states to prevent 0 stuck on backspacing)
   const [vendorName, setVendorName] = useState(user?.vendor?.name || 'Amul Milk Express');
   const [vendorPhone, setVendorPhone] = useState(user?.vendor?.phone || '');
-  const [pricePerLitre, setPricePerLitre] = useState(user?.vendor?.defaultPricePerLitre || 60);
-  const [defaultQty, setDefaultQty] = useState(user?.vendor?.defaultDailyQuantity || 1.5);
+  const [pricePerLitre, setPricePerLitre] = useState<string>(
+    user?.vendor?.defaultPricePerLitre ? String(user.vendor.defaultPricePerLitre) : '60'
+  );
+  const [defaultQty, setDefaultQty] = useState<string>(
+    user?.vendor?.defaultDailyQuantity ? String(user.vendor.defaultDailyQuantity) : '1.5'
+  );
   const [preferredSlot, setPreferredSlot] = useState<'morning' | 'evening' | 'both'>(user?.vendor?.preferredSlot || 'morning');
 
   const [savedUser, setSavedUser] = useState(false);
@@ -34,8 +41,8 @@ export const ProfileScreen: React.FC = () => {
       if (user.vendor) {
         setVendorName(user.vendor.name || 'Amul Milk Express');
         setVendorPhone(user.vendor.phone || '');
-        setPricePerLitre(user.vendor.defaultPricePerLitre || 60);
-        setDefaultQty(user.vendor.defaultDailyQuantity || 1.5);
+        setPricePerLitre(user.vendor.defaultPricePerLitre ? String(user.vendor.defaultPricePerLitre) : '60');
+        setDefaultQty(user.vendor.defaultDailyQuantity ? String(user.vendor.defaultDailyQuantity) : '1.5');
         setPreferredSlot(user.vendor.preferredSlot || 'morning');
       }
     }
@@ -68,8 +75,8 @@ export const ProfileScreen: React.FC = () => {
       name: vendorName,
       phone: vendorPhone,
       countryCode: user.vendor?.countryCode || '+91',
-      defaultPricePerLitre: Number(pricePerLitre),
-      defaultDailyQuantity: Number(defaultQty),
+      defaultPricePerLitre: Number(pricePerLitre) || 60,
+      defaultDailyQuantity: Number(defaultQty) || 1.5,
       preferredSlot,
     });
     setSavedVendor(true);
@@ -110,8 +117,6 @@ export const ProfileScreen: React.FC = () => {
             <p>Users are responsible for accurately recording daily milk deliveries, quantity overrides, and monthly settlements.</p>
             <h4 className="font-extrabold text-slate-900 text-xs">2. Account Responsibility</h4>
             <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
-            <h4 className="font-extrabold text-slate-900 text-xs">3. Data Usage</h4>
-            <p>Your delivery logs and rate settings are stored securely in Google Cloud Firestore to generate monthly statements and PDF invoices.</p>
           </div>
         </div>
       </div>
@@ -143,10 +148,6 @@ export const ProfileScreen: React.FC = () => {
 
           <div className="space-y-3 text-xs leading-relaxed text-slate-700">
             <p>Your privacy is important to us. RW-Milk Tracker collects only necessary data to manage milk delivery records and monthly statements.</p>
-            <h4 className="font-extrabold text-slate-900 text-xs">Information We Collect</h4>
-            <p>We collect your email, name, phone number, vendor contact details, and daily milk quantity logs.</p>
-            <h4 className="font-extrabold text-slate-900 text-xs">Data Security & Account Deletion</h4>
-            <p>All data is synchronized securely with Cloud Firestore. You can permanently request full account & data deletion at any time via the Delete Account option.</p>
           </div>
         </div>
       </div>
@@ -178,43 +179,11 @@ export const ProfileScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* App Purpose */}
           <div className="space-y-1.5 text-xs text-slate-700">
-            <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0284C7]">App Purpose (Yeh App Kis Kaam Ke Liye Hai)</h4>
+            <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0284C7]">App Purpose</h4>
             <p className="font-semibold leading-relaxed">
               RW-Milk Tracker aapke ghar daily aane wale milk ka exact record rakhne aur month ke end me bina kisi mistake ke accurate bill calculate karne ke liye banaya gaya hai.
             </p>
-          </div>
-
-          {/* How to Use Guide */}
-          <div className="space-y-2.5 pt-2 border-t border-slate-100">
-            <h4 className="font-black text-slate-900 text-xs uppercase tracking-wider text-[#0284C7]">How to Use (Kaise Use Karein)</h4>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2 text-xs">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 size={16} className="text-[#0284C7] shrink-0 mt-0.5" />
-                <div>
-                  <strong className="font-black text-slate-900 block">1. Daily Milk Record Entry</strong>
-                  <span className="text-slate-600 font-medium">Dashboard ya Calendar page par ja kar kisi bhi Date Card par tap karein aur us din jitna milk aaya (e.g. 1.5L, 2L, ya Missed) record karein.</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="font-black text-slate-900 block">2. Monthly Invoice & Dues</strong>
-                  <span className="text-slate-600 font-medium">Invoices tab me har month ka card ban jata hai. Card click karke pure month ka total litres aur bill amount due dekhein.</span>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <CheckCircle2 size={16} className="text-purple-600 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="font-black text-slate-900 block">3. WhatsApp Sharing & PDF Download</strong>
-                  <span className="text-slate-600 font-medium">Statement ko WhatsApp par vendor ko bhejein ya top right Download PDF button se official PDF download karein.</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -347,6 +316,7 @@ export const ProfileScreen: React.FC = () => {
             </div>
           </div>
 
+          {/* Flexible Number Inputs (No Stuck 0!) */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-700">Price / Litre (₹)</label>
@@ -354,8 +324,9 @@ export const ProfileScreen: React.FC = () => {
                 <IndianRupee size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#0284C7]" />
                 <input
                   type="number"
+                  placeholder="60"
                   value={pricePerLitre}
-                  onChange={(e) => setPricePerLitre(Number(e.target.value))}
+                  onChange={(e) => setPricePerLitre(e.target.value)}
                   className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-extrabold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                 />
               </div>
@@ -368,8 +339,9 @@ export const ProfileScreen: React.FC = () => {
                 <input
                   type="number"
                   step="0.5"
+                  placeholder="1.5"
                   value={defaultQty}
-                  onChange={(e) => setDefaultQty(Number(e.target.value))}
+                  onChange={(e) => setDefaultQty(e.target.value)}
                   className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-extrabold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                 />
               </div>
@@ -439,7 +411,6 @@ export const ProfileScreen: React.FC = () => {
                 <span className="truncate">{user?.vendor?.name || 'Dairy Vendor'}</span>
               </div>
 
-              {/* Account Created Date DD/MM/YYYY */}
               <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
                 <Calendar size={11} className="text-slate-500 shrink-0" />
                 <span className="truncate">Created: {formatDateDDMMYYYY(user?.createdAt)}</span>
@@ -464,7 +435,7 @@ export const ProfileScreen: React.FC = () => {
             </div>
             <div className="text-left min-w-0">
               <h3 className="text-sm font-black text-slate-900 group-hover:text-[#0284C7] transition-colors truncate">My Profile Settings</h3>
-              <p className="text-[11px] font-semibold text-slate-500 truncate">Edit full name & mobile number</p>
+              <p className="text-xs font-semibold text-slate-500 truncate">Edit full name & mobile number</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
@@ -482,7 +453,7 @@ export const ProfileScreen: React.FC = () => {
             </div>
             <div className="text-left min-w-0">
               <h3 className="text-sm font-black text-slate-900 group-hover:text-emerald-600 transition-colors truncate">Vendor & Milk Delivery Settings</h3>
-              <p className="text-[11px] font-semibold text-slate-500 truncate">Dairy name, price per litre & default daily quantity</p>
+              <p className="text-xs font-semibold text-slate-500 truncate">Dairy name, price per litre & default daily quantity</p>
             </div>
           </div>
           <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
@@ -490,7 +461,7 @@ export const ProfileScreen: React.FC = () => {
 
         {/* Line-by-Line Stacked Legal & App Options */}
         <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-xs space-y-1">
-          <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider mb-2 px-1">Legal & Data Privacy</h4>
+          <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2 px-1">Legal & Data Privacy</h4>
 
           <button
             onClick={() => setSubView('terms_page')}
@@ -543,17 +514,53 @@ export const ProfileScreen: React.FC = () => {
           size="lg"
           className="w-full font-black mt-3 py-3.5 shadow-md shadow-rose-500/20"
           icon={<LogOut size={17} />}
-          onClick={logout}
+          onClick={() => setShowLogoutConfirm(true)}
         >
           Sign Out of Account
         </GlassButton>
 
         {/* Copyright Notice */}
-        <div className="pt-4 text-center text-[11px] font-bold text-slate-400 space-y-1">
+        <div className="pt-4 text-center text-xs font-bold text-slate-400 space-y-1">
           <p>© 2026 RW-Milk Tracker Inc. All rights reserved.</p>
-          <p className="text-[10px] text-slate-400 font-medium">Designed & Developed for Smart Dairy Logistics</p>
+          <p className="text-[11px] text-slate-400 font-medium">Designed & Developed for Smart Dairy Logistics</p>
         </div>
       </div>
+
+      {/* Sign Out Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-sm w-full space-y-4 text-center">
+            <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mx-auto">
+              <AlertTriangle size={24} />
+            </div>
+            <div>
+              <h3 className="text-base font-black text-slate-900">Sign Out Confirmation</h3>
+              <p className="text-xs font-semibold text-slate-500 mt-1">
+                Do you want to logout of your RW-Milk Tracker account?
+              </p>
+            </div>
+            <div className="flex gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold rounded-2xl transition-all cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  logout();
+                }}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold rounded-2xl shadow-md transition-all cursor-pointer"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

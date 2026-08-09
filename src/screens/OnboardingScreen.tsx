@@ -16,8 +16,14 @@ export const OnboardingScreen: React.FC = () => {
   const [vendorName, setVendorName] = useState(user?.vendor?.name || 'Amul Dairy Service');
   const [vendorPhone, setVendorPhone] = useState(user?.vendor?.phone || '');
   const [countryCode, setCountryCode] = useState(user?.vendor?.countryCode || '+91');
-  const [pricePerLitre, setPricePerLitre] = useState(user?.vendor?.defaultPricePerLitre || 60);
-  const [dailyQty, setDailyQty] = useState(user?.vendor?.defaultDailyQuantity || 1.5);
+  
+  // String state for numbers so user can backspace completely without 0 stuck
+  const [pricePerLitre, setPricePerLitre] = useState<string>(
+    user?.vendor?.defaultPricePerLitre ? String(user.vendor.defaultPricePerLitre) : '60'
+  );
+  const [dailyQty, setDailyQty] = useState<string>(
+    user?.vendor?.defaultDailyQuantity ? String(user.vendor.defaultDailyQuantity) : '1.5'
+  );
   const [slot, setSlot] = useState<'morning' | 'evening' | 'both'>('morning');
   const [loading, setLoading] = useState(false);
 
@@ -34,8 +40,8 @@ export const OnboardingScreen: React.FC = () => {
       name: vendorName,
       phone: vendorPhone,
       countryCode,
-      defaultPricePerLitre: Number(pricePerLitre),
-      defaultDailyQuantity: Number(dailyQty),
+      defaultPricePerLitre: Number(pricePerLitre) || 60,
+      defaultDailyQuantity: Number(dailyQty) || 1.5,
       preferredSlot: slot,
     };
 
@@ -93,7 +99,7 @@ export const OnboardingScreen: React.FC = () => {
                     placeholder="Yash Vishal"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                   />
                 </div>
               </div>
@@ -109,7 +115,7 @@ export const OnboardingScreen: React.FC = () => {
                     placeholder="9973489973"
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                   />
                 </div>
               </div>
@@ -139,7 +145,7 @@ export const OnboardingScreen: React.FC = () => {
                     placeholder="e.g. Amul Milk Express"
                     value={vendorName}
                     onChange={(e) => setVendorName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                   />
                 </div>
               </div>
@@ -165,12 +171,12 @@ export const OnboardingScreen: React.FC = () => {
                     placeholder="9876543210"
                     value={vendorPhone}
                     onChange={(e) => setVendorPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#0284C7]"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-bold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                   />
                 </div>
               </div>
 
-              {/* Price & Daily Qty */}
+              {/* Price & Daily Qty: Allows full backspacing without 0 stuck! */}
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-[11px] font-extrabold text-slate-600 uppercase mb-1">
@@ -180,8 +186,9 @@ export const OnboardingScreen: React.FC = () => {
                     <IndianRupee size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-600 font-bold" />
                     <input
                       type="number"
+                      placeholder="60"
                       value={pricePerLitre}
-                      onChange={(e) => setPricePerLitre(Number(e.target.value))}
+                      onChange={(e) => setPricePerLitre(e.target.value)}
                       className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-extrabold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                     />
                   </div>
@@ -196,8 +203,9 @@ export const OnboardingScreen: React.FC = () => {
                     <input
                       type="number"
                       step="0.5"
+                      placeholder="1.5"
                       value={dailyQty}
-                      onChange={(e) => setDailyQty(Number(e.target.value))}
+                      onChange={(e) => setDailyQty(e.target.value)}
                       className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-extrabold text-slate-900 focus:outline-none focus:border-[#0284C7]"
                     />
                   </div>

@@ -21,16 +21,15 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-  // Allow editing from 1st of current selected month up to today
   const firstOfMonthStr = `${year}-${String(monthIdx + 1).padStart(2, '0')}-01`;
 
   const daysArray = Array.from({ length: totalDaysInMonth }, (_, i) => i + 1);
   const paddingArray = Array.from({ length: firstDayOfWeek }, (_, i) => i);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {/* Weekday Labels Header */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-black text-slate-700 uppercase tracking-wider py-1.5 border-b border-slate-200">
+      <div className="grid grid-cols-7 gap-1 text-center text-[11px] sm:text-xs font-black text-slate-700 uppercase tracking-wider py-1 border-b border-slate-200">
         {WEEKDAYS.map((day) => (
           <div key={day} className="py-0.5">
             {day}
@@ -39,15 +38,14 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
       </div>
 
       {/* Grid Cards */}
-      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {paddingArray.map((_, idx) => (
-          <div key={`pad-${idx}`} className="h-20 bg-transparent" />
+          <div key={`pad-${idx}`} className="h-16 sm:h-20 bg-transparent" />
         ))}
 
         {daysArray.map((dayNum) => {
           const dateStr = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
           
-          // Editable range: From 1st of month up to today!
           const isBeforeFirstOfMonth = dateStr < firstOfMonthStr;
           const isFuture = dateStr > todayStr;
           const isToday = dateStr === todayStr;

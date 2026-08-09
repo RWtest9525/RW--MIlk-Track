@@ -5,7 +5,7 @@ import { ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
 import { ActiveTab } from '../../types';
 import { getUserAvailableMonths } from '../../utils/dateUtils';
 
-export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashboard' }) => {
+export const Header: React.FC<{ activeTab?: ActiveTab }> = () => {
   const { user } = useAuth();
   const { selectedMonth, setSelectedMonth } = useMilk();
 
@@ -40,7 +40,7 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashb
 
   return (
     <header
-      className={`px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 transition-transform duration-300 ease-in-out print:hidden ${
+      className={`px-4 sm:px-6 pt-7 pb-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 transition-transform duration-300 ease-in-out print:hidden ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
@@ -54,10 +54,10 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashb
           />
 
           <div>
-            <h1 className="text-sm font-black leading-tight text-slate-900 tracking-tight">
+            <h1 className="text-sm sm:text-base font-black leading-tight text-slate-900 tracking-tight">
               RW-Milk Tracker
             </h1>
-            <p className="text-[10px] font-extrabold text-[#0284C7]">
+            <p className="text-[11px] font-extrabold text-[#0284C7]">
               Smart Dairy Logistics
             </p>
           </div>
