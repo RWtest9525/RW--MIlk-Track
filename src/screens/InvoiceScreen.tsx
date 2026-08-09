@@ -5,6 +5,7 @@ import { WhatsAppPreviewModal } from '../components/invoice/WhatsAppPreviewModal
 import { PaymentLedgerModal } from '../components/invoice/PaymentLedgerModal';
 import { GlassButton } from '../components/common/GlassButton';
 import { Badge } from '../components/common/Badge';
+import { getUserAvailableMonths, formatDateDDMMYYYY } from '../utils/dateUtils';
 import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText, Search, SlidersHorizontal, X, Check } from 'lucide-react';
 
 const MONTH_NAMES = [
@@ -12,22 +13,14 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-const FULL_MONTH_LIST = [
-  { key: '2026-08', label: 'AUGUST 2026', monthName: 'August', yearName: '2026' },
-  { key: '2026-07', label: 'JULY 2026', monthName: 'July', yearName: '2026' },
-  { key: '2026-06', label: 'JUNE 2026', monthName: 'June', yearName: '2026' },
-  { key: '2026-05', label: 'MAY 2026', monthName: 'May', yearName: '2026' },
-  { key: '2026-04', label: 'APRIL 2026', monthName: 'April', yearName: '2026' },
-  { key: '2026-03', label: 'MARCH 2026', monthName: 'March', yearName: '2026' },
-  { key: '2026-02', label: 'FEBRUARY 2026', monthName: 'February', yearName: '2026' },
-  { key: '2026-01', label: 'JANUARY 2026', monthName: 'January', yearName: '2026' },
-];
-
 export const InvoiceScreen: React.FC = () => {
   const { invoice, setSelectedMonth, selectedMonth } = useMilk();
   const { user } = useAuth();
 
-  // Detail View State: null (shows month cards) | monthKey string (e.g. '2026-01')
+  // Dynamic Month List generated strictly from User Account Creation date onwards
+  const userMonthList = getUserAvailableMonths(user?.createdAt);
+
+  // Detail View State: null (shows month cards) | monthKey string (e.g. '2026-08')
   const [activeMonthCard, setActiveMonthCard] = useState<string | null>(null);
 
   // Search & Filter States
@@ -46,8 +39,15 @@ export const InvoiceScreen: React.FC = () => {
     setActiveMonthCard(monthKey);
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = (label: string) => {
+    const originalTitle = document.title;
+    const cleanDateStr = formatDateDDMMYYYY().replace(/\//g, '-');
+    const pdfFileName = `RW-Milk-Tracker-Invoice-${label.replace(/\s+/g, '-')}-${cleanDateStr}`;
+    document.title = pdfFileName;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
   };
 
   const handleApplyFilter = () => {
@@ -71,8 +71,8 @@ export const InvoiceScreen: React.FC = () => {
     setSearchQuery('');
   };
 
-  // Filtered month list based on Search query & Filter Drawer settings
-  const filteredMonthList = FULL_MONTH_LIST.filter((m) => {
+  // Filtered month list
+  const filteredMonthList = userMonthList.filter((m) => {
     const matchesSearch = searchQuery === '' || m.label.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMonth = filterMonth === 'all' || m.monthName.toLowerCase() === filterMonth.toLowerCase();
     const matchesYear = filterYear === 'all' || m.yearName === filterYear;
@@ -84,10 +84,10 @@ export const InvoiceScreen: React.FC = () => {
 
   // 1. FULL PREMIUM INVOICE & PDF VIEW (When a Month Card is clicked)
   if (activeMonthCard) {
-    const selectedMonthLabel = FULL_MONTH_LIST.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
+    const selectedMonthLabel = userMonthList.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
 
     return (
-      <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0">
+      <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-none">
         
         {/* Top Action Bar: Back button + Top Right Download PDF Button */}
         <div className="flex items-center justify-between print:hidden">
@@ -101,7 +101,7 @@ export const InvoiceScreen: React.FC = () => {
 
           {/* Top Right Download PDF Button */}
           <button
-            onClick={handleDownloadPDF}
+            onClick={() => handleDownloadPDF(selectedMonthLabel)}
             className="px-4 py-2 bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white hover:brightness-110 rounded-2xl text-xs font-black shadow-md shadow-cyan-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95"
           >
             <Download size={15} />
@@ -110,7 +110,7 @@ export const InvoiceScreen: React.FC = () => {
         </div>
 
         {/* Printable Detailed Invoice Document */}
-        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-900 print:shadow-none print:border-none">
+        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-900 print:shadow-none print:border-none print:rounded-none print:p-2">
           
           {/* Invoice Document Header */}
           <div className="flex items-start justify-between border-b border-slate-200 pb-5">
@@ -131,7 +131,7 @@ export const InvoiceScreen: React.FC = () => {
               <Badge variant={invoice.status === 'paid' ? 'paid' : invoice.status === 'partial' ? 'custom' : 'unpaid'}>
                 {invoice.status === 'paid' ? 'Paid' : invoice.status === 'partial' ? 'Partial Settlement' : 'Unpaid Dues'}
               </Badge>
-              <p className="text-[11px] font-bold text-slate-500 mt-2">Issued: {new Date().toLocaleDateString('en-IN')}</p>
+              <p className="text-[11px] font-bold text-slate-500 mt-2">Issued: {formatDateDDMMYYYY()}</p>
             </div>
           </div>
 
@@ -250,7 +250,7 @@ export const InvoiceScreen: React.FC = () => {
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search month or year (e.g. January 2026)..."
+            placeholder="Search month or year (e.g. August 2026)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7] shadow-xs"

@@ -3,7 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { LegalModal, LegalType } from '../components/common/LegalModal';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Trash2, Camera } from 'lucide-react';
+import { formatDateDDMMYYYY } from '../utils/dateUtils';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Trash2, Camera, Calendar } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
@@ -251,44 +252,55 @@ export const ProfileScreen: React.FC = () => {
         className="hidden"
       />
 
-      {/* User Header Profile Card with Direct Gallery Photo Chooser */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm flex items-center gap-4">
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className="relative group cursor-pointer shrink-0"
-          title="Click to choose profile photo from gallery"
-        >
-          <img
-            src={user?.photoURL || '/logo.png'}
-            alt="User Profile"
-            className="w-16 h-16 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 group-hover:brightness-90 transition-all"
-          />
-          <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
-            <Camera size={18} />
+      {/* User Header Profile Card with Direct Gallery Photo Chooser & Account Created Date */}
+      <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm space-y-3">
+        <div className="flex items-center gap-4">
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="relative group cursor-pointer shrink-0"
+            title="Click to choose profile photo from gallery"
+          >
+            <img
+              src={user?.photoURL || '/logo.png'}
+              alt="User Profile"
+              className="w-16 h-16 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0 group-hover:brightness-90 transition-all"
+            />
+            <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera size={18} />
+            </div>
+            <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border border-white shadow-sm">
+              <Camera size={10} />
+            </span>
           </div>
-          <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#0284C7] text-white rounded-full flex items-center justify-center border border-white shadow-sm">
-            <Camera size={10} />
-          </span>
-        </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-slate-900 truncate">
-              {user?.name || 'Customer Profile'}
-            </h2>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="text-[10px] font-black text-[#0284C7] hover:underline cursor-pointer"
-            >
-              Change Photo
-            </button>
-          </div>
-          <p className="text-xs font-semibold text-slate-500 truncate">
-            {user?.phone || 'Mobile not set'} • {user?.email || 'Email user'}
-          </p>
-          <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full mt-1.5">
-            <Store size={12} className="text-[#0284C7]" />
-            <span className="truncate">{user?.vendor?.name || 'Dairy Vendor'}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-black text-slate-900 truncate">
+                {user?.name || 'Customer Profile'}
+              </h2>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-[10px] font-black text-[#0284C7] hover:underline cursor-pointer"
+              >
+                Change Photo
+              </button>
+            </div>
+            <p className="text-xs font-semibold text-slate-500 truncate">
+              {user?.phone || 'Mobile not set'} • {user?.email || 'Email user'}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-2 mt-1.5">
+              <div className="inline-flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                <Store size={12} className="text-[#0284C7]" />
+                <span className="truncate">{user?.vendor?.name || 'Dairy Vendor'}</span>
+              </div>
+
+              {/* Account Created Date DD/MM/YYYY */}
+              <div className="inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
+                <Calendar size={11} className="text-slate-500" />
+                <span>Account Created: {formatDateDDMMYYYY(user?.createdAt)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -3,33 +3,22 @@ import { useAuth } from '../../context/AuthContext';
 import { useMilk } from '../../context/MilkContext';
 import { ChevronDown, Store, Calendar as CalendarIcon } from 'lucide-react';
 import { ActiveTab } from '../../types';
-
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+import { getUserAvailableMonths } from '../../utils/dateUtils';
 
 export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashboard' }) => {
   const { user } = useAuth();
   const { selectedMonth, setSelectedMonth } = useMilk();
 
+  const monthOptions = getUserAvailableMonths(user?.createdAt);
+
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(e.target.value);
   };
 
-  const monthOptions = [];
-  const now = new Date();
-  for (let i = -5; i <= 3; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
-    monthOptions.push({ key, label });
-  }
-
   // NON-DASHBOARD VIEWS: Compact brand header (no user/vendor avatar or month filter pill)
   if (activeTab !== 'dashboard') {
     return (
-      <header className="px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
+      <header className="px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 print:hidden">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-2.5">
             <img
@@ -51,7 +40,7 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashb
 
   // DASHBOARD VIEW ONLY: User Avatar, Name, Vendor Name & Month Selector Pill
   return (
-    <header className="px-4 sm:px-6 pt-3 pb-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
+    <header className="px-4 sm:px-6 pt-3 pb-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 print:hidden">
       <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
         {/* User Avatar Info & App Logo */}
         <div className="flex items-center gap-3">
@@ -75,7 +64,7 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashb
           </div>
         </div>
 
-        {/* Month Selector Pill */}
+        {/* Month Selector Pill (Account Creation Aware) */}
         <div className="relative inline-flex items-center border border-slate-300 bg-slate-50 rounded-2xl px-3 py-1.5 text-xs font-bold text-slate-800 shadow-2xs">
           <CalendarIcon size={14} className="text-[#0284C7] mr-1.5" />
           <select
