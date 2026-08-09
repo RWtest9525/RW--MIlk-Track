@@ -50,14 +50,19 @@ export const EditDateModal: React.FC<EditDateModalProps> = ({
 
   const handleSave = async () => {
     setLoading(true);
-    await updateDateLog(
-      dateStr,
-      status,
-      status === 'missed' ? 0 : quantity,
-      notes.trim() || undefined
-    );
-    setLoading(false);
-    onClose();
+    try {
+      await updateDateLog(
+        dateStr,
+        status,
+        status === 'missed' ? 0 : quantity,
+        notes.trim() || undefined
+      );
+    } catch (err) {
+      console.error('Save log error:', err);
+    } finally {
+      setLoading(false);
+      onClose();
+    }
   };
 
   return (
