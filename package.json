@@ -1,0 +1,52 @@
+{
+  "name": "rw-milk-track",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~4.0.1",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-three/drei": "^9.121.5",
+    "@react-three/fiber": "^8.17.14",
+    "clsx": "^2.1.1",
+    "expo": "~52.0.37",
+    "expo-blur": "~14.0.3",
+    "expo-font": "~13.0.4",
+    "expo-linear-gradient": "~14.0.2",
+    "expo-status-bar": "~2.0.1",
+    "firebase": "^11.3.0",
+    "lucide-react": "^1.30.0",
+    "lucide-react-native": "^0.475.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-native": "0.76.7",
+    "react-native-gesture-handler": "~2.20.2",
+    "react-native-reanimated": "~3.16.1",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-svg": "15.8.0",
+    "react-native-web": "^0.19.13",
+    "tailwind-merge": "^3.0.1",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/node": "^22.13.4",
+    "@types/react": "~18.3.12",
+    "@types/three": "^0.173.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.2",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.3.3",
+    "vite": "^6.1.0"
+  },
+  "private": true
+}
