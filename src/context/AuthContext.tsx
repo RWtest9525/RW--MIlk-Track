@@ -1,21 +1,15 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
-  auth,
-  db,
-} from '../config/firebase';
-import {
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
   signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  signInWithPopup,
+  deleteUser,
 } from 'firebase/auth';
-import {
-  doc,
-  getDoc,
-  setDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 import { UserProfile, VendorProfile } from '../types';
 
 interface AuthContextType {
@@ -37,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Listen to Firebase Auth Changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -44,9 +39,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-          setUser(userDoc.data() as UserProfile);
+          const data = userDoc.data() as UserProfile;
+          if (data.isDeleted) {
+            // User was soft-deleted earlier -> Purge account
+            if (auth.currentUser) {
+              try {
+                await deleteUser(auth.currentUser);
+              } catch (e) {
+                await firebaseSignOut(auth);
+              }
+            }
+            setUser(null);
+          } else {
+            setUser(data);
+          }
         } else {
-          // Default profile for new user
+          // New User setup
           const newProfile: UserProfile = {
             uid: firebaseUser.uid,
             name: firebaseUser.displayName || 'Customer',
@@ -142,9 +150,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteAccountData = async () => {
     if (!user) return;
-    await setDoc(doc(db, 'users', user.uid), { isDeleted: true, deletedAt: new Date().toISOString() }, { merge: true });
-    await firebaseSignOut(auth);
+    const currentUser = auth.currentUser;
+    const uid = user.uid;
+
     setUser(null);
+
+    // 1. Delete Firestore User Document
+    try {
+      await deleteDoc(doc(db, 'users', uid));
+    } catch (e) {
+      console.error('Firestore delete doc error:', e);
+    }
+
+    // 2. Delete Firebase Auth User Account permanently
+    if (currentUser) {
+      try {
+        await deleteUser(currentUser);
+      } catch (e) {
+        console.error('Firebase Auth deleteUser error:', e);
+        await firebaseSignOut(auth);
+      }
+    }
   };
 
   return (
