@@ -86,7 +86,7 @@ export const InvoiceScreen: React.FC = () => {
     const selectedMonthLabel = userMonthList.find((m) => m.key === activeMonthCard)?.label || activeMonthCard;
 
     return (
-      <div className="space-y-5 pb-36 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-none">
+      <div className="space-y-5 pb-52 animate-fade-in max-w-4xl mx-auto print:p-0 print:m-0 print:max-w-none">
         
         {/* Top Action Bar: Back button + RED Download PDF Button */}
         <div className="flex items-center justify-between print:hidden">
@@ -243,7 +243,7 @@ export const InvoiceScreen: React.FC = () => {
 
   // 2. MAIN MONTHLY CARDS LIST VIEW WITH SEARCH & FILTER
   return (
-    <div className="space-y-5 pb-36 animate-fade-in max-w-4xl mx-auto">
+    <div className="space-y-5 pb-52 animate-fade-in max-w-4xl mx-auto">
       
       {/* Header */}
       <div>
@@ -362,9 +362,9 @@ export const InvoiceScreen: React.FC = () => {
         </div>
       )}
 
-      {/* FILTER POPUP MODAL */}
+      {/* FILTER POPUP MODAL (LIGHT GLASS BACKDROP) */}
       {filterModalOpen && (
-        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-900/30 backdrop-blur-md animate-fade-in">
+        <div className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-[100] flex items-center justify-center p-4 bg-slate-900/10 backdrop-blur-xs animate-fade-in">
           <div className="bg-white rounded-3xl p-6 shadow-2xl border border-slate-200 w-full max-w-sm space-y-4 my-auto relative z-[101]">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 font-black text-slate-900 text-sm">
