@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
 import { formatDateDDMMYYYY } from '../utils/dateUtils';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2 } from 'lucide-react';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2, Trash2 } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
