@@ -27,7 +27,7 @@ export const Hero3DCard: React.FC<{ onNavigateToInvoice: () => void }> = ({ onNa
           </span>
         </div>
 
-        {/* Compact Net Amount directly in header to save space */}
+        {/* Compact Net Amount directly in header */}
         <div className="flex items-center gap-1">
           <span className="text-xs font-bold text-slate-500">Net Due:</span>
           <span className="text-base font-black text-slate-900 tracking-tight">
@@ -36,10 +36,20 @@ export const Hero3DCard: React.FC<{ onNavigateToInvoice: () => void }> = ({ onNa
         </div>
       </div>
 
+      {/* Dedicated Info Box directly underneath Milk Analytics header */}
+      <div className="mt-2 bg-slate-100/90 border border-slate-200 rounded-2xl px-3 py-1.5 flex items-center justify-between text-xs font-bold z-10 relative shadow-2xs">
+        <span className="inline-flex items-center gap-1 text-[#0284C7] font-black">
+          <IndianRupee size={13} /> ₹{user?.vendor?.defaultPricePerLitre}/L Rate
+        </span>
+        <span className="inline-flex items-center gap-1 text-slate-700 capitalize font-extrabold">
+          <Clock size={13} className="text-amber-600" /> {user?.vendor?.preferredSlot || 'morning'} Slot
+        </span>
+      </div>
+
       {/* Hero Body: Left Metrics & Right 3D Render */}
       <div className="grid grid-cols-12 items-center mt-3 gap-2 z-10 relative">
         {/* Metrics Left */}
-        <div className="col-span-7 space-y-2.5">
+        <div className="col-span-7 space-y-2">
           <div>
             <p className="text-[11px] text-slate-500 font-extrabold uppercase tracking-wide">Total Milk Consumed</p>
             <div className="flex items-baseline gap-1.5 mt-0.5">
@@ -48,23 +58,12 @@ export const Hero3DCard: React.FC<{ onNavigateToInvoice: () => void }> = ({ onNa
               </span>
               <span className="text-xs font-extrabold text-slate-600">Litres</span>
             </div>
-            
-            {/* Integrated Rate & Preferred Slot Info */}
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-700 mt-1">
-              <span className="inline-flex items-center gap-0.5 text-[#0284C7] font-extrabold">
-                <IndianRupee size={12} /> ₹{user?.vendor?.defaultPricePerLitre}/L
-              </span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1 text-slate-600 capitalize">
-                <Clock size={12} className="text-amber-600" /> {user?.vendor?.preferredSlot || 'morning'} Slot
-              </span>
-            </div>
           </div>
         </div>
 
         {/* 3D Bottle Right */}
         <div className="col-span-5 relative flex items-center justify-center">
-          <MilkBottle3D fillPercentage={fillPercentage} height={145} />
+          <MilkBottle3D fillPercentage={fillPercentage} height={140} />
 
           {/* Floating % Pill */}
           <div className="absolute bottom-0 right-0 bg-white border border-slate-200 px-2 py-0.5 rounded-xl text-[10px] font-black text-[#0284C7] shadow-xs flex items-center gap-1">

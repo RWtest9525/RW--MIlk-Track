@@ -20,8 +20,8 @@ export const MonthlyProgress: React.FC = () => {
         </span>
       </div>
 
-      {/* Sleek Thinner Progress Bar */}
-      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden flex">
+      {/* Ultra-Thin Sleek Status Bar */}
+      <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden flex">
         <div
           style={{ width: `${deliveredPct}%` }}
           className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 shadow-2xs"
