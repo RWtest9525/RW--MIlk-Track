@@ -53,15 +53,17 @@ export const AuthScreen: React.FC = () => {
       {/* Clean Centered Login Card */}
       <div className="w-full max-w-md space-y-6 relative z-10 animate-fade-in">
         
-        {/* Large Zoomed Circular Logo Header */}
+        {/* Flush Circular Logo Header (No Inner White Gap) */}
         <div className="text-center space-y-3">
           <div className="inline-block relative">
-            <img
-              src="/logo.png"
-              alt="RW-Milk Tracker Logo"
-              loading="eager"
-              className="w-32 h-32 rounded-full mx-auto shadow-xl border-4 border-cyan-500 object-cover bg-white transition-transform hover:scale-105"
-            />
+            <div className="w-36 h-36 rounded-full mx-auto shadow-2xl border-4 border-[#0284C7] overflow-hidden p-0 bg-white transition-transform hover:scale-105">
+              <img
+                src="/logo.png"
+                alt="RW-Milk Tracker Logo"
+                loading="eager"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
           </div>
 
           <div>
@@ -74,11 +76,11 @@ export const AuthScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Clean Light Theme Auth Form Container */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 space-y-5">
+        {/* Clean Light Theme Form Container */}
+        <div className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 space-y-5">
           
-          {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+          {/* Segmented Mode Switcher Tabs */}
+          <div className="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-slate-100 border border-slate-200">
             <button
               type="button"
               onClick={() => {
@@ -87,7 +89,7 @@ export const AuthScreen: React.FC = () => {
               }}
               className={`py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer ${
                 mode === 'login'
-                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 shadow-md'
+                  ? 'bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white shadow-md shadow-cyan-500/20'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
@@ -102,7 +104,7 @@ export const AuthScreen: React.FC = () => {
               }}
               className={`py-2.5 text-xs font-black rounded-xl transition-all cursor-pointer ${
                 mode === 'signup'
-                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 shadow-md'
+                  ? 'bg-gradient-to-r from-[#0284C7] to-[#0EA5E9] text-white shadow-md shadow-cyan-500/20'
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
@@ -110,12 +112,12 @@ export const AuthScreen: React.FC = () => {
             </button>
           </div>
 
-          {/* Official Google OAuth Button with Full SVG */}
+          {/* Premium Google OAuth Button */}
           <button
             type="button"
             onClick={handleGoogle}
             disabled={loading}
-            className="w-full py-3 px-4 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-3 transition-all active:scale-95 cursor-pointer bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 shadow-sm"
+            className="w-full py-3.5 px-4 rounded-2xl text-xs font-extrabold flex items-center justify-center gap-3 transition-all active:scale-98 cursor-pointer bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 shadow-sm hover:shadow-md"
           >
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path
@@ -128,7 +130,7 @@ export const AuthScreen: React.FC = () => {
               />
               <path
                 fill="#FBBC05"
-                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.29C.47 8.2.01 10.04.01 12c0 1.96.46 3.8 1.28 5.42l3.99-3.15z"
+                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.45.38-2.27V6.58H1.29C.47 8.2.01 10.04.01 12c0 1.96.46 3.8 1.28 5.42l3.99-3.15z"
               />
               <path
                 fill="#EA4335"
@@ -145,17 +147,17 @@ export const AuthScreen: React.FC = () => {
           </div>
 
           {error && (
-            <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-xs text-rose-600 flex items-center gap-2 font-medium">
+            <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-xs text-rose-600 flex items-center gap-2 font-semibold">
               <AlertCircle size={15} className="shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          {/* Clean Form */}
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
             {mode === 'signup' && (
               <div>
-                <label className="block text-[11px] font-bold uppercase mb-1 text-slate-600">
+                <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-600">
                   Full Name
                 </label>
                 <div className="relative">
@@ -165,14 +167,14 @@ export const AuthScreen: React.FC = () => {
                     placeholder="Yash Vishal"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-[11px] font-bold uppercase mb-1 text-slate-600">
+              <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-600">
                 Email Address
               </label>
               <div className="relative">
@@ -182,13 +184,13 @@ export const AuthScreen: React.FC = () => {
                   placeholder="name@domain.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase mb-1 text-slate-600">
+              <label className="block text-[11px] font-extrabold uppercase mb-1 text-slate-600">
                 Password
               </label>
               <div className="relative">
@@ -198,7 +200,7 @@ export const AuthScreen: React.FC = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-2xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0284C7]"
                 />
               </div>
             </div>
@@ -206,7 +208,7 @@ export const AuthScreen: React.FC = () => {
             <GlassButton
               variant="primary"
               size="lg"
-              className="w-full mt-1 font-black shadow-md shadow-cyan-500/20"
+              className="w-full mt-2 font-black py-3.5 shadow-lg shadow-cyan-500/25"
               loading={loading}
               icon={mode === 'login' ? <LogIn size={17} /> : <UserPlus size={17} />}
               type="submit"
