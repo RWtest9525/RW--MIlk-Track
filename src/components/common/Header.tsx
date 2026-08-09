@@ -28,11 +28,11 @@ export const Header: React.FC = () => {
   return (
     <header className="px-4 sm:px-6 pt-3.5 pb-3 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900">
       <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
-        {/* User Info & App Logo */}
+        {/* User Avatar Info & App Logo */}
         <div className="flex items-center gap-3">
           <img
-            src="/logo.png"
-            alt="RW-Milk Tracker"
+            src={user?.photoURL || '/logo.png'}
+            alt="User Avatar"
             className="w-10 h-10 rounded-full border-2 border-[#0284C7] object-cover shadow-sm bg-white p-0"
           />
 

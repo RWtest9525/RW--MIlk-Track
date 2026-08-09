@@ -1,15 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  auth,
+  db,
+} from '../config/firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
   signOut as firebaseSignOut,
-  User as FirebaseUser
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import {
+  doc,
+  getDoc,
+  setDoc,
+} from 'firebase/firestore';
 import { UserProfile, VendorProfile } from '../types';
 
 interface AuthContextType {
@@ -20,18 +26,10 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateVendorProfile: (vendor: VendorProfile) => Promise<void>;
-  updateUserProfile: (name: string, phone: string) => Promise<void>;
+  updateUserProfile: (name: string, phone: string, photoURL?: string) => Promise<void>;
   completeOnboarding: (name: string, phone: string, vendor: VendorProfile) => Promise<void>;
+  deleteAccountData: () => Promise<void>;
 }
-
-const DEFAULT_VENDOR: VendorProfile = {
-  name: 'My Milk Dairy',
-  phone: '',
-  countryCode: '+91',
-  defaultPricePerLitre: 60,
-  defaultDailyQuantity: 1.5,
-  preferredSlot: 'morning',
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -40,36 +38,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
-      if (fbUser) {
-        // Fetch User profile from Firestore
-        const userRef = doc(db, 'users', fbUser.uid);
-        const snapshot = await getDoc(userRef);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userDoc = await getDoc(userDocRef);
 
-        if (snapshot.exists()) {
-          setUser(snapshot.data() as UserProfile);
+        if (userDoc.exists()) {
+          setUser(userDoc.data() as UserProfile);
         } else {
-          // Create initial user profile document in Firestore
-          const initialProfile: UserProfile = {
-            uid: fbUser.uid,
-            name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
-            email: fbUser.email || '',
-            phone: fbUser.phoneNumber || '',
-            photoURL: fbUser.photoURL || undefined,
-            vendor: DEFAULT_VENDOR,
+          // Default profile for new user
+          const newProfile: UserProfile = {
+            uid: firebaseUser.uid,
+            name: firebaseUser.displayName || 'Customer',
+            email: firebaseUser.email || '',
+            phone: firebaseUser.phoneNumber || '',
+            photoURL: firebaseUser.photoURL || '',
+            vendor: {
+              name: 'Amul Milk Express',
+              phone: '',
+              countryCode: '+91',
+              defaultPricePerLitre: 60,
+              defaultDailyQuantity: 1.5,
+              preferredSlot: 'morning',
+            },
             isOnboarded: false,
             createdAt: new Date().toISOString(),
           };
-          await setDoc(userRef, initialProfile);
-          setUser(initialProfile);
+          await setDoc(userDocRef, newProfile);
+          setUser(newProfile);
         }
-
-        // Setup real-time listener for profile updates
-        onSnapshot(userRef, (docSnap) => {
-          if (docSnap.exists()) {
-            setUser(docSnap.data() as UserProfile);
-          }
-        });
       } else {
         setUser(null);
       }
@@ -85,18 +82,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUpWithEmail = async (email: string, pass: string, name: string) => {
     const res = await createUserWithEmailAndPassword(auth, email, pass);
-    const userRef = doc(db, 'users', res.user.uid);
-    const initialProfile: UserProfile = {
+    const newProfile: UserProfile = {
       uid: res.user.uid,
-      name: name || email.split('@')[0],
-      email: email,
+      name,
+      email,
       phone: '',
-      vendor: DEFAULT_VENDOR,
+      photoURL: '',
+      vendor: {
+        name: 'Amul Milk Express',
+        phone: '',
+        countryCode: '+91',
+        defaultPricePerLitre: 60,
+        defaultDailyQuantity: 1.5,
+        preferredSlot: 'morning',
+      },
       isOnboarded: false,
       createdAt: new Date().toISOString(),
     };
-    await setDoc(userRef, initialProfile);
-    setUser(initialProfile);
+    await setDoc(doc(db, 'users', res.user.uid), newProfile);
+    setUser(newProfile);
   };
 
   const loginWithGoogle = async () => {
@@ -116,9 +120,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
 
-  const updateUserProfile = async (name: string, phone: string) => {
+  const updateUserProfile = async (name: string, phone: string, photoURL?: string) => {
     if (!user) return;
-    const updated = { ...user, name, phone };
+    const updated = { ...user, name, phone, photoURL: photoURL ?? user.photoURL };
     setUser(updated);
     await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
@@ -136,6 +140,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
 
+  const deleteAccountData = async () => {
+    if (!user) return;
+    await setDoc(doc(db, 'users', user.uid), { isDeleted: true, deletedAt: new Date().toISOString() }, { merge: true });
+    await firebaseSignOut(auth);
+    setUser(null);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -148,6 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateVendorProfile,
         updateUserProfile,
         completeOnboarding,
+        deleteAccountData,
       }}
     >
       {children}
