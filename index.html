@@ -6,34 +6,31 @@
     <title>MilkTrack - Daily Milk Tracking & Auto-Invoice</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
         padding: 0;
-        background-color: #0B0F17;
+        background-color: #060911;
         color: #F8FAFC;
         font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         overflow-x: hidden;
-        user-select: none;
-        -webkit-user-select: none;
       }
       #root {
+        width: 100%;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        max-width: 480px;
-        margin: 0 auto;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-        position: relative;
-        background-color: #0B0F17;
       }
       /* Custom scrollbar */
       ::-webkit-scrollbar {
         width: 6px;
       }
       ::-webkit-scrollbar-track {
-        background: #0B0F17;
+        background: #060911;
       }
       ::-webkit-scrollbar-thumb {
         background: #1E293B;
@@ -44,7 +41,7 @@
       }
     </style>
   </head>
-  <body class="bg-[#0B0F17] text-slate-100 antialiased">
+  <body class="bg-[#060911] text-slate-100 antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
