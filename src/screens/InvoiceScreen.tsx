@@ -5,7 +5,7 @@ import { WhatsAppPreviewModal } from '../components/invoice/WhatsAppPreviewModal
 import { PaymentLedgerModal } from '../components/invoice/PaymentLedgerModal';
 import { GlassButton } from '../components/common/GlassButton';
 import { Badge } from '../components/common/Badge';
-import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText, Printer } from 'lucide-react';
+import { Download, ChevronRight, ArrowLeft, MessageSquare, CreditCard, Calendar, IndianRupee, Droplets, Store, History, Wallet, QrCode, FileText } from 'lucide-react';
 
 const MONTH_LIST = [
   { key: '2026-08', label: 'AUGUST 2026' },
@@ -19,7 +19,7 @@ const MONTH_LIST = [
 ];
 
 export const InvoiceScreen: React.FC = () => {
-  const { invoice, setSelectedMonth, selectedMonth, logs } = useMilk();
+  const { invoice, setSelectedMonth, selectedMonth } = useMilk();
   const { user } = useAuth();
 
   // Selected Month Card Detail View: null (shows month cards) | monthKey string (e.g. '2026-01')
@@ -69,7 +69,7 @@ export const InvoiceScreen: React.FC = () => {
         </div>
 
         {/* Printable Detailed Invoice Document */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-900 print:shadow-none print:border-none">
+        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-900 print:shadow-none print:border-none">
           
           {/* Invoice Document Header */}
           <div className="flex items-start justify-between border-b border-slate-200 pb-5">
@@ -114,7 +114,7 @@ export const InvoiceScreen: React.FC = () => {
           {/* Cost Summary Breakdown */}
           <div className="space-y-3">
             <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Billing Summary</h3>
-            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
               <div className="p-3.5 flex justify-between text-xs border-b border-slate-100">
                 <span className="font-semibold text-slate-600">Total Days in Month</span>
                 <span className="font-extrabold text-slate-900">{invoice.totalDays} Days</span>
@@ -191,26 +191,26 @@ export const InvoiceScreen: React.FC = () => {
     );
   }
 
-  // 2. MAIN MONTHLY CARDS LIST VIEW
+  // 2. MAIN MONTHLY CARDS LIST VIEW WITH DISTINCT BORDERS
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-4xl mx-auto">
       
       {/* Header */}
       <div>
-        <h2 className="text-xl font-black text-slate-900">Monthly Invoices & Bills</h2>
+        <h2 className="text-xl font-black text-slate-900">Monthly Invoices & Statements</h2>
         <p className="text-xs font-semibold text-slate-500 mt-0.5">
-          Select any month card below to view detailed invoice & download PDF
+          Select any month card below to view detailed statement & download PDF
         </p>
       </div>
 
-      {/* Monthly Cards List Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+      {/* Monthly Cards List Grid with Sharp Distinct Borders */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {MONTH_LIST.map((m) => {
           return (
             <div
               key={m.key}
               onClick={() => handleSelectMonthCard(m.key)}
-              className="bg-white hover:bg-slate-50 border border-slate-200 rounded-3xl p-5 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer group space-y-3 relative overflow-hidden"
+              className="bg-white hover:bg-slate-50 border-2 border-slate-200/90 hover:border-[#0284C7] rounded-3xl p-5 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group space-y-3 relative overflow-hidden"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
@@ -229,7 +229,7 @@ export const InvoiceScreen: React.FC = () => {
               </div>
 
               {/* Card Footer Info */}
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+              <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs">
                 <div>
                   <span className="text-[10px] text-slate-400 font-bold block uppercase">Est. Rate</span>
                   <span className="font-extrabold text-slate-900">₹{defaultPrice}/L</span>

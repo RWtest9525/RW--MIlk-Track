@@ -1,11 +1,9 @@
 import React from 'react';
 import { useMilk } from '../../context/MilkContext';
-import { useAuth } from '../../context/AuthContext';
-import { CheckCircle2, XCircle, IndianRupee, Clock, TrendingUp } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp } from 'lucide-react';
 
 export const MonthlyProgress: React.FC = () => {
   const { invoice } = useMilk();
-  const { user } = useAuth();
 
   const deliveredPct = Math.round((invoice.deliveredDays / Math.max(1, invoice.totalDays)) * 100);
   const missedPct = Math.round((invoice.missedDays / Math.max(1, invoice.totalDays)) * 100);
@@ -60,18 +58,6 @@ export const MonthlyProgress: React.FC = () => {
               {invoice.missedDays} <span className="text-xs font-bold text-rose-800">days</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Rates & Slot Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-3.5 flex items-center justify-between text-xs text-slate-800 shadow-xs">
-        <div className="flex items-center gap-2">
-          <IndianRupee size={15} className="text-[#0284C7]" />
-          <span className="font-semibold">Base Rate: <strong className="text-slate-900 font-black">₹{user?.vendor?.defaultPricePerLitre} / Litre</strong></span>
-        </div>
-        <div className="flex items-center gap-1.5 text-slate-700 border-l border-slate-200 pl-3">
-          <Clock size={14} className="text-amber-600" />
-          <span className="capitalize font-bold">{user?.vendor?.preferredSlot || 'morning'} Slot</span>
         </div>
       </div>
     </div>

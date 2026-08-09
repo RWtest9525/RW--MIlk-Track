@@ -43,7 +43,7 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const daysInMonth = useMemo(() => getDaysInMonth(year, monthNum - 1), [year, monthNum]);
 
-  // Real-time Cloud Firestore synchronization for monthly logs & invoice
+  // Real-time Cloud Firestore synchronization for monthly logs & invoice (Manual Mode)
   useEffect(() => {
     if (!user?.uid) {
       setLogs({});
@@ -57,63 +57,22 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (snapshot.exists()) {
         const data = snapshot.data();
         const storedLogs: Record<string, DailyLog> = data.logs || {};
-        
-        // Auto-fill past/present default logs without adding fake overrides
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const mergedLogs: Record<string, DailyLog> = { ...storedLogs };
-
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          if (!mergedLogs[dateStr] && dateStr <= todayStr) {
-            mergedLogs[dateStr] = {
-              date: dateStr,
-              status: 'delivered',
-              quantity: defaultQty,
-              updatedAt: new Date().toISOString(),
-            };
-          }
-        }
-
-        setLogs(mergedLogs);
+        setLogs(storedLogs);
         setAmountPaid(data.amountPaid || 0);
         setPaymentHistory(data.paymentHistory || []);
         setPreviousPendingBalance(data.previousPendingBalance || 0);
       } else {
-        // Initialize clean default month in Firestore
-        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-        const cleanLogs: Record<string, DailyLog> = {};
-
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          if (dateStr <= todayStr) {
-            cleanLogs[dateStr] = {
-              date: dateStr,
-              status: 'delivered',
-              quantity: defaultQty,
-              updatedAt: new Date().toISOString(),
-            };
-          }
-        }
-
-        setLogs(cleanLogs);
+        setLogs({});
         setAmountPaid(0);
         setPaymentHistory([]);
         setPreviousPendingBalance(0);
-
-        setDoc(monthDocRef, {
-          logs: cleanLogs,
-          amountPaid: 0,
-          paymentHistory: [],
-          previousPendingBalance: 0,
-          updatedAt: new Date().toISOString(),
-        });
       }
     });
 
     return () => unsubscribe();
-  }, [user?.uid, selectedMonth, daysInMonth, defaultQty, year, monthNum]);
+  }, [user?.uid, selectedMonth]);
 
-  // Calculate monthly stats based on real logs
+  // Calculate monthly stats based on user's manual logs
   const invoice = useMemo((): MonthlyInvoice => {
     let deliveredDays = 0;
     let missedDays = 0;

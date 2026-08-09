@@ -3,7 +3,7 @@ import { MilkBottle3D } from '../3d/MilkBottle3D';
 import { useMilk } from '../../context/MilkContext';
 import { useAuth } from '../../context/AuthContext';
 import { Badge } from '../common/Badge';
-import { Sparkles, Droplets, ArrowUpRight } from 'lucide-react';
+import { Sparkles, Droplets, ArrowUpRight, IndianRupee, Clock } from 'lucide-react';
 
 export const Hero3DCard: React.FC<{ onNavigateToInvoice: () => void }> = ({ onNavigateToInvoice }) => {
   const { invoice } = useMilk();
@@ -45,9 +45,17 @@ export const Hero3DCard: React.FC<{ onNavigateToInvoice: () => void }> = ({ onNa
               </span>
               <span className="text-sm font-bold text-slate-600">Litres</span>
             </div>
-            <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
-              {fillPercentage}% of monthly target ({targetLitres.toFixed(1)}L)
-            </p>
+            
+            {/* Integrated Rate & Preferred Slot Info */}
+            <div className="flex items-center gap-2 text-[11px] font-extrabold text-slate-700 mt-1">
+              <span className="inline-flex items-center gap-0.5 text-[#0284C7]">
+                <IndianRupee size={12} /> ₹{user?.vendor?.defaultPricePerLitre}/L
+              </span>
+              <span>•</span>
+              <span className="inline-flex items-center gap-1 text-slate-600 capitalize">
+                <Clock size={12} className="text-amber-600" /> {user?.vendor?.preferredSlot || 'morning'} Slot
+              </span>
+            </div>
           </div>
 
           <div className="pt-2 border-t border-slate-200">
