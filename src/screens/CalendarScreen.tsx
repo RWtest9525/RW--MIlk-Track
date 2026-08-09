@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CalendarGrid } from '../components/calendar/CalendarGrid';
 import { EditDateModal } from '../components/calendar/EditDateModal';
 import { useMilk } from '../context/MilkContext';
-import { CheckCircle2, XCircle, PlusCircle, Info, Plus } from 'lucide-react';
+import { CheckCircle2, XCircle, PlusCircle, Plus } from 'lucide-react';
 
 export const CalendarScreen: React.FC = () => {
   const { selectedMonth } = useMilk();
@@ -46,14 +46,6 @@ export const CalendarScreen: React.FC = () => {
       {/* Main Grid Calendar Container */}
       <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-xl">
         <CalendarGrid onSelectDate={(dStr) => setSelectedDate(dStr)} />
-      </div>
-
-      {/* Manual Mode Tip Banner */}
-      <div className="bg-cyan-50/80 border border-cyan-200 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-cyan-950 font-medium">
-        <Info size={16} className="text-[#0284C7] shrink-0 mt-0.5" />
-        <span>
-          Pure Manual Mode: Days are not auto-marked. Tap any active date card to record milk deliveries. Dates prior to your account registration are disabled.
-        </span>
       </div>
 
       {/* Edit Modal */}

@@ -1,17 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { GlassButton } from '../components/common/GlassButton';
-import { LegalModal, LegalType } from '../components/common/LegalModal';
 import { DeleteAccountScreen } from './DeleteAccountScreen';
 import { formatDateDDMMYYYY } from '../utils/dateUtils';
-import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Trash2, Camera, Calendar } from 'lucide-react';
+import { User, Store, Phone, IndianRupee, Droplets, LogOut, CheckCircle, Save, ChevronRight, ShieldCheck, FileText, Info, ArrowLeft, Camera, Calendar, Building2 } from 'lucide-react';
 
 export const ProfileScreen: React.FC = () => {
   const { user, updateUserProfile, updateVendorProfile, logout } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Navigation sub-views: null (main menu) | 'profile_page' | 'vendor_page' | 'delete_page'
-  const [subView, setSubView] = useState<'profile_page' | 'vendor_page' | 'delete_page' | null>(null);
+  // Navigation sub-views: null (main menu) | 'profile_page' | 'vendor_page' | 'delete_page' | 'terms_page' | 'privacy_page' | 'about_page'
+  const [subView, setSubView] = useState<'profile_page' | 'vendor_page' | 'delete_page' | 'terms_page' | 'privacy_page' | 'about_page' | null>(null);
 
   // Profile Form States
   const [name, setName] = useState(user?.name || '');
@@ -26,9 +25,6 @@ export const ProfileScreen: React.FC = () => {
 
   const [savedUser, setSavedUser] = useState(false);
   const [savedVendor, setSavedVendor] = useState(false);
-
-  // Legal Modal
-  const [legalModalType, setLegalModalType] = useState<LegalType | null>(null);
 
   // Gallery Photo Picker Trigger
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +66,114 @@ export const ProfileScreen: React.FC = () => {
     return <DeleteAccountScreen onBack={() => setSubView(null)} />;
   }
 
-  // 2. DEDICATED PAGE VIEW: Profile Settings Page
+  // 2. DEDICATED PAGE VIEW: Terms & Conditions
+  if (subView === 'terms_page') {
+    return (
+      <div className="space-y-5 pb-28 animate-fade-in max-w-2xl mx-auto">
+        <button
+          onClick={() => setSubView(null)}
+          className="inline-flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#0284C7] transition-colors cursor-pointer py-1"
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Settings</span>
+        </button>
+
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4 text-slate-900">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="w-10 h-10 rounded-2xl bg-cyan-50 border border-cyan-200 flex items-center justify-center text-[#0284C7]">
+              <FileText size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Terms & Conditions</h2>
+              <p className="text-xs font-semibold text-slate-500">Last updated: August 2026</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 text-xs leading-relaxed text-slate-700">
+            <p>Welcome to <strong>RW-Milk Tracker</strong>. By logging in or using our service, you agree to comply with and be bound by the following terms.</p>
+            <h4 className="font-extrabold text-slate-900 text-xs">1. Daily Milk Logging</h4>
+            <p>Users are responsible for accurately recording daily milk deliveries, quantity overrides, and monthly settlements.</p>
+            <h4 className="font-extrabold text-slate-900 text-xs">2. Account Responsibility</h4>
+            <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+            <h4 className="font-extrabold text-slate-900 text-xs">3. Data Usage</h4>
+            <p>Your delivery logs and rate settings are stored securely in Google Cloud Firestore to generate monthly statements and PDF invoices.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. DEDICATED PAGE VIEW: Privacy Policy
+  if (subView === 'privacy_page') {
+    return (
+      <div className="space-y-5 pb-28 animate-fade-in max-w-2xl mx-auto">
+        <button
+          onClick={() => setSubView(null)}
+          className="inline-flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#0284C7] transition-colors cursor-pointer py-1"
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Settings</span>
+        </button>
+
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4 text-slate-900">
+          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+              <ShieldCheck size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Privacy Policy</h2>
+              <p className="text-xs font-semibold text-slate-500">Google Play Compliant Privacy Standard</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 text-xs leading-relaxed text-slate-700">
+            <p>Your privacy is important to us. RW-Milk Tracker collects only necessary data to manage milk delivery records and monthly statements.</p>
+            <h4 className="font-extrabold text-slate-900 text-xs">Information We Collect</h4>
+            <p>We collect your email, name, phone number, vendor contact details, and daily milk quantity logs.</p>
+            <h4 className="font-extrabold text-slate-900 text-xs">Data Security & Account Deletion</h4>
+            <p>All data is synchronized securely with Cloud Firestore. You can permanently request full account & data deletion at any time via the Delete Account option.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. DEDICATED PAGE VIEW: About RW-Milk Tracker
+  if (subView === 'about_page') {
+    return (
+      <div className="space-y-5 pb-28 animate-fade-in max-w-2xl mx-auto">
+        <button
+          onClick={() => setSubView(null)}
+          className="inline-flex items-center gap-2 text-xs font-black text-slate-600 hover:text-[#0284C7] transition-colors cursor-pointer py-1"
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Settings</span>
+        </button>
+
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4 text-slate-900 text-center">
+          <img
+            src="/logo.png"
+            alt="RW-Milk Tracker"
+            className="w-20 h-20 rounded-full border-4 border-[#0284C7] object-cover shadow-md mx-auto"
+          />
+          <div>
+            <h2 className="text-xl font-black text-slate-900">RW-Milk Tracker</h2>
+            <p className="text-xs font-extrabold text-[#0284C7]">Version 1.0.0 (Production Build)</p>
+          </div>
+
+          <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed font-semibold">
+            RW-Milk Tracker is an intelligent, modern dairy logistics app designed for households and dairy vendors to track daily milk consumption, settle monthly dues, and generate PDF statements.
+          </p>
+
+          <div className="pt-4 border-t border-slate-100 text-[11px] font-bold text-slate-500">
+            Powered by Firebase Cloud Firestore & React 18
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 5. DEDICATED PAGE VIEW: Profile Settings Page
   if (subView === 'profile_page') {
     return (
       <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
@@ -140,7 +243,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 3. DEDICATED PAGE VIEW: Vendor & Delivery Settings Page
+  // 6. DEDICATED PAGE VIEW: Vendor & Delivery Settings Page
   if (subView === 'vendor_page') {
     return (
       <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
@@ -239,7 +342,7 @@ export const ProfileScreen: React.FC = () => {
     );
   }
 
-  // 4. MAIN SETTINGS MENU VIEW WITH INTERACTIVE CAMERA AVATAR (NO TEXT BUTTON)
+  // 7. MAIN SETTINGS MENU VIEW WITH COPYRIGHT NOTICE
   return (
     <div className="space-y-5 pb-28 animate-fade-in max-w-xl mx-auto">
       
@@ -252,7 +355,7 @@ export const ProfileScreen: React.FC = () => {
         className="hidden"
       />
 
-      {/* User Header Profile Card with Interactive Camera Photo Chooser */}
+      {/* User Header Profile Card */}
       <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3">
         <div className="flex items-center gap-3.5">
           <div
@@ -342,7 +445,7 @@ export const ProfileScreen: React.FC = () => {
           <h4 className="text-[11px] font-black uppercase text-slate-400 tracking-wider mb-2 px-1">Legal & Data Privacy</h4>
 
           <button
-            onClick={() => setLegalModalType('terms')}
+            onClick={() => setSubView('terms_page')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -353,7 +456,7 @@ export const ProfileScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setLegalModalType('privacy')}
+            onClick={() => setSubView('privacy_page')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -364,7 +467,7 @@ export const ProfileScreen: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setLegalModalType('about')}
+            onClick={() => setSubView('about_page')}
             className="w-full p-3 rounded-2xl hover:bg-slate-50 flex items-center justify-between text-xs font-bold text-slate-800 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -396,13 +499,13 @@ export const ProfileScreen: React.FC = () => {
         >
           Sign Out of Account
         </GlassButton>
-      </div>
 
-      {/* Legal Modal */}
-      <LegalModal
-        type={legalModalType}
-        onClose={() => setLegalModalType(null)}
-      />
+        {/* Copyright Notice */}
+        <div className="pt-4 text-center text-[11px] font-bold text-slate-400 space-y-1">
+          <p>© 2026 RW-Milk Tracker Inc. All rights reserved.</p>
+          <p className="text-[10px] text-slate-400 font-medium">Designed & Developed for Smart Dairy Logistics</p>
+        </div>
+      </div>
     </div>
   );
 };

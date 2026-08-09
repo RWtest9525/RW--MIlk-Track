@@ -11,14 +11,6 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
 
   const defaultQty = user?.vendor?.defaultDailyQuantity ?? 1.5;
 
-  let createdDateStr = '1970-01-01';
-  if (user?.createdAt) {
-    const createdDate = new Date(user.createdAt);
-    if (!isNaN(createdDate.getTime())) {
-      createdDateStr = `${createdDate.getFullYear()}-${String(createdDate.getMonth() + 1).padStart(2, '0')}-${String(createdDate.getDate()).padStart(2, '0')}`;
-    }
-  }
-
   const [yearStr, monthStr] = selectedMonth.split('-');
   const year = parseInt(yearStr, 10);
   const monthIdx = parseInt(monthStr, 10) - 1;
@@ -28,6 +20,9 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
 
   const now = new Date();
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  // Allow editing from 1st of current selected month up to today
+  const firstOfMonthStr = `${year}-${String(monthIdx + 1).padStart(2, '0')}-01`;
 
   const daysArray = Array.from({ length: totalDaysInMonth }, (_, i) => i + 1);
   const paddingArray = Array.from({ length: firstDayOfWeek }, (_, i) => i);
@@ -51,7 +46,9 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
 
         {daysArray.map((dayNum) => {
           const dateStr = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-          const isBeforeRegistration = dateStr < createdDateStr;
+          
+          // Editable range: From 1st of month up to today!
+          const isBeforeFirstOfMonth = dateStr < firstOfMonthStr;
           const isFuture = dateStr > todayStr;
           const isToday = dateStr === todayStr;
           const log = logs[dateStr];
@@ -62,7 +59,7 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
               dayNumber={dayNum}
               dateStr={dateStr}
               isFuture={isFuture}
-              isBeforeRegistration={isBeforeRegistration}
+              isBeforeRegistration={isBeforeFirstOfMonth}
               isToday={isToday}
               log={log}
               defaultQty={defaultQty}

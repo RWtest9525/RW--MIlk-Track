@@ -22,19 +22,8 @@ export const AppContainer: React.FC = () => {
   const [invoiceModalOpen, setInvoiceModalOpen] = useState<boolean>(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState<boolean>(false);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center text-slate-900 space-y-3">
-        <div className="w-10 h-10 border-3 border-[#0284C7] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-extrabold text-slate-500 animate-pulse">
-          Loading RW-Milk Tracker...
-        </p>
-      </div>
-    );
-  }
-
   // 1. If not logged in -> ALWAYS show Auth Screen (Sign In / Register)
-  if (!user) {
+  if (!loading && !user) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <AuthScreen />
@@ -43,7 +32,7 @@ export const AppContainer: React.FC = () => {
   }
 
   // 2. If logged in but not onboarded -> Setup Screen
-  if (!user.isOnboarded) {
+  if (user && !user.isOnboarded) {
     return (
       <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <OnboardingScreen />
