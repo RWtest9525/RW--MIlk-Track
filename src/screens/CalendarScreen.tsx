@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CalendarGrid } from '../components/calendar/CalendarGrid';
 import { EditDateModal } from '../components/calendar/EditDateModal';
 import { useMilk } from '../context/MilkContext';
-import { CheckCircle2, XCircle, PlusCircle, Plus } from 'lucide-react';
+import { CheckCircle2, XCircle, PlusCircle } from 'lucide-react';
 
 export const CalendarScreen: React.FC = () => {
   const { selectedMonth } = useMilk();
@@ -24,8 +24,8 @@ export const CalendarScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Legend Chips */}
-      <div className="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 rounded-2xl p-3 text-xs shadow-xs">
+      {/* Legend Chips (Delivered, Missed, Custom Qty) */}
+      <div className="flex flex-wrap items-center justify-start gap-4 bg-white border border-slate-200 rounded-2xl p-3 text-xs shadow-xs">
         <div className="flex items-center gap-1.5 text-emerald-700 font-extrabold">
           <CheckCircle2 size={15} className="text-emerald-600" /> Delivered
         </div>
@@ -36,10 +36,6 @@ export const CalendarScreen: React.FC = () => {
 
         <div className="flex items-center gap-1.5 text-amber-700 font-extrabold">
           <PlusCircle size={15} className="text-amber-600" /> Custom Qty
-        </div>
-
-        <div className="flex items-center gap-1.5 text-slate-500 font-bold">
-          <Plus size={14} className="text-slate-400" /> Unlogged (+ Add)
         </div>
       </div>
 

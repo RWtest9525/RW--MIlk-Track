@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useMilk } from '../../context/MilkContext';
 import { ChevronDown, Calendar as CalendarIcon } from 'lucide-react';
@@ -9,14 +9,41 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = ({ activeTab = 'dashb
   const { user } = useAuth();
   const { selectedMonth, setSelectedMonth } = useMilk();
 
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
   const monthOptions = getUserAvailableMonths(user?.createdAt);
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedMonth(e.target.value);
   };
 
+  // Scroll Direction Listener for Auto-Hiding Header
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 60) {
+        // Scrolling Down -> Hide Header
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling Up -> Show Header
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <header className="px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 print:hidden">
+    <header
+      className={`px-4 sm:px-6 py-2.5 sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-xs text-slate-900 transition-transform duration-300 ease-in-out print:hidden ${
+        isVisible ? 'translate-y-0' : '-translate-y-full'
+      }`}
+    >
       <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
         {/* App Logo & Company Brand Header */}
         <div className="flex items-center gap-3">
