@@ -6,6 +6,8 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   deleteUser,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
@@ -31,8 +33,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Listen to Firebase Auth Changes
+  // Listen to Firebase Auth Changes & Handle Redirect Results for APK/Mobile Web
   useEffect(() => {
+    // Process redirect result from APK / Mobile Web login flow
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result?.user) {
+          const userDocRef = doc(db, 'users', result.user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (!userDoc.exists()) {
+            const newProfile: UserProfile = {
+              uid: result.user.uid,
+              name: result.user.displayName || 'Customer',
+              email: result.user.email || '',
+              phone: result.user.phoneNumber || '',
+              photoURL: result.user.photoURL || '',
+              vendor: {
+                name: 'Amul Milk Express',
+                phone: '',
+                countryCode: '+91',
+                defaultPricePerLitre: 60,
+                defaultDailyQuantity: 1.5,
+                preferredSlot: 'morning',
+              },
+              isOnboarded: false,
+              createdAt: new Date().toISOString(),
+            };
+            await setDoc(userDocRef, newProfile);
+            setUser(newProfile);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('getRedirectResult warning:', err);
+      });
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
@@ -113,7 +148,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+
+    const isMobileOrAPK = /android|iphone|ipad|ipod/i.test(navigator.userAgent) || 
+                          window.matchMedia('(display-mode: standalone)').matches ||
+                          navigator.userAgent.toLowerCase().includes('wv');
+
+    if (isMobileOrAPK) {
+      try {
+        await signInWithRedirect(auth, provider);
+      } catch (err: any) {
+        console.warn('signInWithRedirect failed, trying signInWithPopup:', err);
+        await signInWithPopup(auth, provider);
+      }
+    } else {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (err: any) {
+        console.warn('signInWithPopup failed, falling back to signInWithRedirect:', err);
+        await signInWithRedirect(auth, provider);
+      }
+    }
   };
 
   const logout = async () => {
