@@ -9,7 +9,7 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
   const { selectedMonth, logs } = useMilk();
   const { user } = useAuth();
 
-  const defaultQty = user?.vendor.defaultDailyQuantity ?? 1.5;
+  const defaultQty = user?.vendor?.defaultDailyQuantity ?? 1.5;
 
   const [yearStr, monthStr] = selectedMonth.split('-');
   const year = parseInt(yearStr, 10);
@@ -27,16 +27,16 @@ export const CalendarGrid: React.FC<{ onSelectDate: (dateStr: string) => void }>
   return (
     <div className="space-y-3">
       {/* Weekday Labels Header */}
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 uppercase tracking-wider py-1 border-b border-slate-800">
+      <div className="grid grid-cols-7 gap-1 text-center text-xs font-black text-slate-700 uppercase tracking-wider py-1.5 border-b border-slate-200">
         {WEEKDAYS.map((day) => (
-          <div key={day} className="py-1">
+          <div key={day} className="py-0.5">
             {day}
           </div>
         ))}
       </div>
 
       {/* Grid Cards */}
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
         {paddingArray.map((_, idx) => (
           <div key={`pad-${idx}`} className="h-20 bg-transparent" />
         ))}

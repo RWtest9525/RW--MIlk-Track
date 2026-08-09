@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
-import { useTheme } from './context/ThemeContext';
 import { AuthScreen } from './screens/AuthScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { DashboardScreen } from './screens/DashboardScreen';
@@ -16,7 +15,6 @@ import { ActiveTab } from './types';
 
 export const AppContainer: React.FC = () => {
   const { user, loading } = useAuth();
-  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
 
   // Modals state
@@ -26,10 +24,10 @@ export const AppContainer: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#060911] flex flex-col items-center justify-center text-slate-100 space-y-4">
-        <div className="w-14 h-14 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-2xl shadow-cyan-500/50" />
-        <p className="text-xs font-black uppercase tracking-widest text-cyan-400 animate-pulse">
-          Connecting Firebase Auth...
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center text-slate-900 space-y-3">
+        <div className="w-10 h-10 border-3 border-[#0284C7] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-extrabold text-slate-500 animate-pulse">
+          Loading RW-Milk Tracker...
         </p>
       </div>
     );
@@ -38,9 +36,7 @@ export const AppContainer: React.FC = () => {
   // 1. If not logged in -> ALWAYS show Auth Screen (Sign In / Register)
   if (!user) {
     return (
-      <div className={`min-h-screen w-full transition-colors duration-300 ${
-        theme === 'dark' ? 'bg-[#060911] text-slate-100' : 'bg-slate-100 text-slate-900'
-      }`}>
+      <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <AuthScreen />
       </div>
     );
@@ -49,9 +45,7 @@ export const AppContainer: React.FC = () => {
   // 2. If logged in but not onboarded -> Setup Screen
   if (!user.isOnboarded) {
     return (
-      <div className={`min-h-screen w-full transition-colors duration-300 ${
-        theme === 'dark' ? 'bg-[#060911] text-slate-100' : 'bg-slate-100 text-slate-900'
-      }`}>
+      <div className="min-h-screen w-full bg-[#F8FAFC] text-slate-900">
         <OnboardingScreen />
       </div>
     );
@@ -61,9 +55,7 @@ export const AppContainer: React.FC = () => {
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   return (
-    <div className={`min-h-screen w-full flex flex-col relative transition-colors duration-300 ${
-      theme === 'dark' ? 'bg-[#060911] text-slate-100' : 'bg-slate-100 text-slate-900'
-    }`}>
+    <div className="min-h-screen w-full flex flex-col relative bg-[#F8FAFC] text-slate-900">
       {/* Top Navbar */}
       <Header />
 
