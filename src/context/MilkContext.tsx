@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { db } from '../config/firebase';
 import { DailyLog, MonthlyInvoice, PaymentRecord, DeliveryStatus } from '../types';
 import { useAuth } from './AuthContext';
-import { getMonthLogs, saveMonthLogs, getMonthlyInvoice, saveMonthlyInvoice } from '../services/storageService';
 
 interface MilkContextType {
   selectedMonth: string; // YYYY-MM
@@ -22,18 +23,17 @@ const MilkContext = createContext<MilkContextType | undefined>(undefined);
 export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   
-  // Default to current month: e.g. "2026-08"
   const now = new Date();
   const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonthKey);
   const [logs, setLogs] = useState<Record<string, DailyLog>>({});
-  const [previousPendingBalance, setPreviousPendingBalance] = useState<number>(150); // Sample carryover balance
+  const [previousPendingBalance, setPreviousPendingBalance] = useState<number>(0);
   const [amountPaid, setAmountPaid] = useState<number>(0);
   const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([]);
 
-  const defaultQty = user?.vendor.defaultDailyQuantity ?? 1.5;
-  const pricePerLitre = user?.vendor.defaultPricePerLitre ?? 64;
+  const defaultQty = user?.vendor?.defaultDailyQuantity ?? 1.5;
+  const pricePerLitre = user?.vendor?.defaultPricePerLitre ?? 60;
 
   // Parse year & month
   const [year, monthNum] = useMemo(() => {
@@ -43,66 +43,77 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const daysInMonth = useMemo(() => getDaysInMonth(year, monthNum - 1), [year, monthNum]);
 
-  // Load / Initialize month logs
+  // Real-time Cloud Firestore synchronization for monthly logs & invoice
   useEffect(() => {
-    const loadLogs = async () => {
-      const storedLogs = await getMonthLogs(selectedMonth);
-      const storedInvoice = await getMonthlyInvoice(selectedMonth);
+    if (!user?.uid) {
+      setLogs({});
+      return;
+    }
 
-      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
 
-      // Auto-populate past and current days if log doesn't exist
-      const initialLogs: Record<string, DailyLog> = { ...storedLogs };
-
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    // Subscribe to Firestore changes
+    const unsubscribe = onSnapshot(monthDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const storedLogs: Record<string, DailyLog> = data.logs || {};
         
-        if (!initialLogs[dateStr]) {
-          // If past or present day
-          if (dateStr <= todayStr) {
-            // Default sample overrides for demo realism (e.g. day 5 missed, day 12 extra)
-            if (day === 5) {
-              initialLogs[dateStr] = {
-                date: dateStr,
-                status: 'missed',
-                quantity: 0,
-                notes: 'Out of town',
-                updatedAt: new Date().toISOString(),
-              };
-            } else if (day === 12) {
-              initialLogs[dateStr] = {
-                date: dateStr,
-                status: 'custom',
-                quantity: defaultQty + 1.0,
-                notes: 'Guests at home (+1L extra)',
-                updatedAt: new Date().toISOString(),
-              };
-            } else {
-              initialLogs[dateStr] = {
-                date: dateStr,
-                status: 'delivered',
-                quantity: defaultQty,
-                updatedAt: new Date().toISOString(),
-              };
-            }
+        // Auto-fill past/present default logs without adding fake overrides
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const mergedLogs: Record<string, DailyLog> = { ...storedLogs };
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          if (!mergedLogs[dateStr] && dateStr <= todayStr) {
+            mergedLogs[dateStr] = {
+              date: dateStr,
+              status: 'delivered',
+              quantity: defaultQty,
+              updatedAt: new Date().toISOString(),
+            };
           }
         }
+
+        setLogs(mergedLogs);
+        setAmountPaid(data.amountPaid || 0);
+        setPaymentHistory(data.paymentHistory || []);
+        setPreviousPendingBalance(data.previousPendingBalance || 0);
+      } else {
+        // Initialize clean default month in Firestore
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const cleanLogs: Record<string, DailyLog> = {};
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          if (dateStr <= todayStr) {
+            cleanLogs[dateStr] = {
+              date: dateStr,
+              status: 'delivered',
+              quantity: defaultQty,
+              updatedAt: new Date().toISOString(),
+            };
+          }
+        }
+
+        setLogs(cleanLogs);
+        setAmountPaid(0);
+        setPaymentHistory([]);
+        setPreviousPendingBalance(0);
+
+        setDoc(monthDocRef, {
+          logs: cleanLogs,
+          amountPaid: 0,
+          paymentHistory: [],
+          previousPendingBalance: 0,
+          updatedAt: new Date().toISOString(),
+        });
       }
+    });
 
-      setLogs(initialLogs);
-      await saveMonthLogs(selectedMonth, initialLogs);
+    return () => unsubscribe();
+  }, [user?.uid, selectedMonth, daysInMonth, defaultQty, year, monthNum]);
 
-      if (storedInvoice) {
-        setAmountPaid(storedInvoice.amountPaid || 0);
-        setPaymentHistory(storedInvoice.paymentHistory || []);
-        setPreviousPendingBalance(storedInvoice.previousPendingBalance || 0);
-      }
-    };
-
-    loadLogs();
-  }, [selectedMonth, daysInMonth, defaultQty]);
-
-  // Calculate monthly stats
+  // Calculate monthly stats based on real logs
   const invoice = useMemo((): MonthlyInvoice => {
     let deliveredDays = 0;
     let missedDays = 0;
@@ -151,6 +162,8 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     quantity: number,
     notes?: string
   ) => {
+    if (!user?.uid) return;
+
     const updatedLogs = {
       ...logs,
       [date]: {
@@ -162,7 +175,9 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
       },
     };
     setLogs(updatedLogs);
-    await saveMonthLogs(selectedMonth, updatedLogs);
+
+    const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
+    await setDoc(monthDocRef, { logs: updatedLogs }, { merge: true });
   };
 
   const markMonthAsPaid = async (
@@ -170,6 +185,8 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     note?: string,
     paymentMethod: PaymentRecord['paymentMethod'] = 'upi'
   ) => {
+    if (!user?.uid) return;
+
     const newRecord: PaymentRecord = {
       id: 'pay_' + Date.now(),
       amount: paymentAmount,
@@ -184,21 +201,25 @@ export const MilkProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAmountPaid(newAmountPaid);
     setPaymentHistory(newHistory);
 
-    const updatedInvoice: MonthlyInvoice = {
-      ...invoice,
-      amountPaid: newAmountPaid,
-      pendingBalance: Math.max(0, invoice.totalAmountDue - newAmountPaid),
-      status: newAmountPaid >= invoice.totalAmountDue ? 'paid' : 'partial',
-      paymentHistory: newHistory,
-      lastPaymentDate: new Date().toISOString(),
-    };
-
-    await saveMonthlyInvoice(selectedMonth, updatedInvoice);
+    const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
+    await setDoc(
+      monthDocRef,
+      {
+        amountPaid: newAmountPaid,
+        paymentHistory: newHistory,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
   };
 
   const refreshMonthData = async () => {
-    const storedLogs = await getMonthLogs(selectedMonth);
-    setLogs(storedLogs);
+    if (!user?.uid) return;
+    const monthDocRef = doc(db, 'users', user.uid, 'months', selectedMonth);
+    const snap = await getDoc(monthDocRef);
+    if (snap.exists()) {
+      setLogs(snap.data().logs || {});
+    }
   };
 
   return (

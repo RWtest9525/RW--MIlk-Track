@@ -1,12 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut as firebaseSignOut,
+  User as FirebaseUser
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 import { UserProfile, VendorProfile } from '../types';
-import { saveUserProfile, getUserProfile } from '../services/storageService';
 
 interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
-  loginWithDemo: () => Promise<void>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateVendorProfile: (vendor: VendorProfile) => Promise<void>;
@@ -14,25 +24,13 @@ interface AuthContextType {
   completeOnboarding: (name: string, phone: string, vendor: VendorProfile) => Promise<void>;
 }
 
-const DEFAULT_DEMO_VENDOR: VendorProfile = {
-  name: 'Amul Milk Express (Rajesh)',
-  phone: '9876543210',
+const DEFAULT_VENDOR: VendorProfile = {
+  name: 'My Milk Dairy',
+  phone: '',
   countryCode: '+91',
-  defaultPricePerLitre: 64,
+  defaultPricePerLitre: 60,
   defaultDailyQuantity: 1.5,
   preferredSlot: 'morning',
-  address: 'Sector 62, Dairy Plaza, Noida',
-};
-
-const DEFAULT_DEMO_USER: UserProfile = {
-  uid: 'demo_user_2026',
-  name: 'Yash Vishal',
-  email: 'yash@milktrack.app',
-  phone: '9973489973',
-  photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  vendor: DEFAULT_DEMO_VENDOR,
-  isOnboarded: true,
-  createdAt: new Date().toISOString(),
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,73 +40,87 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const stored = await getUserProfile();
-      if (stored) {
-        setUser(stored);
+    const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
+      if (fbUser) {
+        // Fetch User profile from Firestore
+        const userRef = doc(db, 'users', fbUser.uid);
+        const snapshot = await getDoc(userRef);
+
+        if (snapshot.exists()) {
+          setUser(snapshot.data() as UserProfile);
+        } else {
+          // Create initial user profile document in Firestore
+          const initialProfile: UserProfile = {
+            uid: fbUser.uid,
+            name: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
+            email: fbUser.email || '',
+            phone: fbUser.phoneNumber || '',
+            photoURL: fbUser.photoURL || undefined,
+            vendor: DEFAULT_VENDOR,
+            isOnboarded: false,
+            createdAt: new Date().toISOString(),
+          };
+          await setDoc(userRef, initialProfile);
+          setUser(initialProfile);
+        }
+
+        // Setup real-time listener for profile updates
+        onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUser(docSnap.data() as UserProfile);
+          }
+        });
       } else {
-        // Auto initialize with Demo User for instant seamless user experience
-        setUser(DEFAULT_DEMO_USER);
-        await saveUserProfile(DEFAULT_DEMO_USER);
+        setUser(null);
       }
       setLoading(false);
-    };
+    });
 
-    initAuth();
+    return () => unsubscribe();
   }, []);
 
-  const loginWithDemo = async () => {
-    setUser(DEFAULT_DEMO_USER);
-    await saveUserProfile(DEFAULT_DEMO_USER);
+  const loginWithEmail = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const loginWithEmail = async (email: string, _pass: string) => {
-    const newUser: UserProfile = {
-      uid: 'user_' + Date.now(),
-      name: email.split('@')[0] || 'Dairy Customer',
-      email,
+  const signUpWithEmail = async (email: string, pass: string, name: string) => {
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    const userRef = doc(db, 'users', res.user.uid);
+    const initialProfile: UserProfile = {
+      uid: res.user.uid,
+      name: name || email.split('@')[0],
+      email: email,
       phone: '',
-      vendor: DEFAULT_DEMO_VENDOR,
+      vendor: DEFAULT_VENDOR,
       isOnboarded: false,
       createdAt: new Date().toISOString(),
     };
-    setUser(newUser);
-    await saveUserProfile(newUser);
+    await setDoc(userRef, initialProfile);
+    setUser(initialProfile);
   };
 
   const loginWithGoogle = async () => {
-    const googleUser: UserProfile = {
-      uid: 'google_' + Date.now(),
-      name: 'Google User',
-      email: 'user@gmail.com',
-      phone: '9876543210',
-      vendor: DEFAULT_DEMO_VENDOR,
-      isOnboarded: false,
-      createdAt: new Date().toISOString(),
-    };
-    setUser(googleUser);
-    await saveUserProfile(googleUser);
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
   };
 
   const logout = async () => {
+    await firebaseSignOut(auth);
     setUser(null);
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('@milktrack_user_profile');
-    }
   };
 
   const updateVendorProfile = async (vendor: VendorProfile) => {
     if (!user) return;
     const updated = { ...user, vendor };
     setUser(updated);
-    await saveUserProfile(updated);
+    await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
 
   const updateUserProfile = async (name: string, phone: string) => {
     if (!user) return;
     const updated = { ...user, name, phone };
     setUser(updated);
-    await saveUserProfile(updated);
+    await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
 
   const completeOnboarding = async (name: string, phone: string, vendor: VendorProfile) => {
@@ -121,7 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isOnboarded: true,
     };
     setUser(updated);
-    await saveUserProfile(updated);
+    await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   };
 
   return (
@@ -129,8 +141,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         loading,
-        loginWithDemo,
         loginWithEmail,
+        signUpWithEmail,
         loginWithGoogle,
         logout,
         updateVendorProfile,
