@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useMilk } from '../../context/MilkContext';
 import { useTheme } from '../../context/ThemeContext';
-import { ChevronDown, Store, Sun, Moon, Calendar as CalendarIcon, Sparkles } from 'lucide-react';
+import { ChevronDown, Store, Sun, Moon, Calendar as CalendarIcon } from 'lucide-react';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -28,44 +28,40 @@ export const Header: React.FC = () => {
   }
 
   return (
-    <header className={`px-5 pt-5 pb-3 sticky top-0 z-30 border-b backdrop-blur-2xl transition-colors duration-300 ${
+    <header className={`px-4 sm:px-6 pt-4 pb-3 sticky top-0 z-30 border-b backdrop-blur-2xl transition-colors duration-300 ${
       theme === 'dark' 
-        ? 'bg-[#080C14]/90 border-white/5 text-slate-100' 
-        : 'bg-white/90 border-slate-200/80 text-slate-900'
+        ? 'bg-[#080C14]/90 border-white/10 text-slate-100' 
+        : 'bg-white/90 border-slate-200/90 text-slate-900 shadow-sm'
     }`}>
-      <div className="flex items-center justify-between gap-2">
-        {/* User Info & Avatar */}
+      <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
+        {/* User Info & App Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src={user?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-              alt={user?.name}
-              className="w-11 h-11 rounded-full border-2 border-cyan-400 object-cover shadow-md shadow-cyan-500/20"
-            />
-            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-400 border-2 border-white dark:border-[#080C14] rounded-full" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="RW-Milk Tracker"
+            className="w-10 h-10 rounded-full border-2 border-cyan-400 object-contain shadow-md bg-white p-0.5"
+          />
 
           <div>
             <div className="flex items-center gap-1">
               <h1 className="text-sm font-extrabold leading-tight">
-                Hello, {user?.name.split(' ')[0]} 👋
+                {user?.name || 'Customer'} 👋
               </h1>
             </div>
             
-            {/* Vendor Chip */}
             <div className="flex items-center gap-1 text-[11px] text-cyan-600 dark:text-cyan-400 font-semibold mt-0.5">
               <Store size={12} className="text-cyan-500" />
-              <span className="truncate max-w-[120px]">{user?.vendor.name}</span>
+              <span className="truncate max-w-[130px]">{user?.vendor?.name || 'Dairy Vendor'}</span>
             </div>
           </div>
         </div>
 
-        {/* Right Controls: Theme Switcher & Month Selector */}
+        {/* Right Controls */}
         <div className="flex items-center gap-2">
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className={`w-9 h-9 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer ${
+            className={`w-9 h-9 rounded-2xl flex items-center justify-center border transition-all duration-200 cursor-pointer shadow-sm ${
               theme === 'dark'
                 ? 'bg-slate-900 border-slate-700 text-amber-400 hover:bg-slate-800'
                 : 'bg-slate-100 border-slate-300 text-cyan-600 hover:bg-slate-200'
