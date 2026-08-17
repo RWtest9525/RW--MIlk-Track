@@ -262,6 +262,7 @@ export const AuthScreen: React.FC = () => {
 
       {/* Play Store Legal Document Modal */}
       <LegalModal
+        isOpen={Boolean(legalModalType)}
         type={legalModalType}
         onClose={() => setLegalModalType(null)}
       />

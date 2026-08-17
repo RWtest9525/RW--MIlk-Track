@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BottomModal } from '../common/BottomModal';
-import { GlassButton } from '../components/common/GlassButton';
 import { useMilk } from '../../context/MilkContext';
 import { useAuth } from '../../context/AuthContext';
 import { formatWhatsAppInvoice, openWhatsAppDirectChat } from '../../services/whatsappService';

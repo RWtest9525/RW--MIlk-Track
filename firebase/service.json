@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "953538760940",
+    "project_id": "rw-milk-track",
+    "storage_bucket": "rw-milk-track.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953538760940:android:3c2b694a79524637e555c9",
+        "android_client_info": {
+          "package_name": "com.rw.milk.tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfkq9YbPDYUcmUHgruJoHi5TTgknwDJ0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

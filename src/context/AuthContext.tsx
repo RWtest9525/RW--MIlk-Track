@@ -68,55 +68,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('getRedirectResult warning:', err);
       });
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
+    // Listen to Firebase Auth Changes with robust error handling
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      async (firebaseUser) => {
+        try {
+          if (firebaseUser) {
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
 
-        if (userDoc.exists()) {
-          const data = userDoc.data() as UserProfile;
-          if (data.isDeleted) {
-            // User was soft-deleted earlier -> Purge account
-            if (auth.currentUser) {
-              try {
-                await deleteUser(auth.currentUser);
-              } catch (e) {
-                await firebaseSignOut(auth);
+            if (userDoc.exists()) {
+              const data = userDoc.data() as UserProfile;
+              if (data.isDeleted) {
+                // User was soft-deleted earlier -> Purge account
+                if (auth.currentUser) {
+                  try {
+                    await deleteUser(auth.currentUser);
+                  } catch (e) {
+                    await firebaseSignOut(auth);
+                  }
+                }
+                setUser(null);
+              } else {
+                setUser(data);
               }
+            } else {
+              // New User setup
+              const newProfile: UserProfile = {
+                uid: firebaseUser.uid,
+                name: firebaseUser.displayName || 'Customer',
+                email: firebaseUser.email || '',
+                phone: firebaseUser.phoneNumber || '',
+                photoURL: firebaseUser.photoURL || '',
+                vendor: {
+                  name: 'Amul Milk Express',
+                  phone: '',
+                  countryCode: '+91',
+                  defaultPricePerLitre: 60,
+                  defaultDailyQuantity: 1.5,
+                  preferredSlot: 'morning',
+                },
+                isOnboarded: false,
+                createdAt: new Date().toISOString(),
+              };
+              await setDoc(userDocRef, newProfile);
+              setUser(newProfile);
             }
-            setUser(null);
           } else {
-            setUser(data);
+            setUser(null);
           }
-        } else {
-          // New User setup
-          const newProfile: UserProfile = {
-            uid: firebaseUser.uid,
-            name: firebaseUser.displayName || 'Customer',
-            email: firebaseUser.email || '',
-            phone: firebaseUser.phoneNumber || '',
-            photoURL: firebaseUser.photoURL || '',
-            vendor: {
-              name: 'Amul Milk Express',
-              phone: '',
-              countryCode: '+91',
-              defaultPricePerLitre: 60,
-              defaultDailyQuantity: 1.5,
-              preferredSlot: 'morning',
-            },
-            isOnboarded: false,
-            createdAt: new Date().toISOString(),
-          };
-          await setDoc(userDocRef, newProfile);
-          setUser(newProfile);
+        } catch (err) {
+          console.error('Error during onAuthStateChanged processing:', err);
+        } finally {
+          setLoading(false);
         }
-      } else {
-        setUser(null);
+      },
+      (error) => {
+        console.error('onAuthStateChanged listener error:', error);
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    );
 
-    return () => unsubscribe();
+    // Fallback safety timer: Ensure loading never hangs if Firebase auth is unresponsive
+    const fallbackTimer = setTimeout(() => {
+      setLoading((prevLoading) => {
+        if (prevLoading) {
+          console.warn('Auth loading timeout fallback triggered.');
+          return false;
+        }
+        return false;
+      });
+    }, 4000);
+
+    return () => {
+      clearTimeout(fallbackTimer);
+      unsubscribe();
+    };
   }, []);
 
   const loginWithEmail = async (email: string, pass: string) => {

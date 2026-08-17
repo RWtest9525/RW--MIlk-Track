@@ -21,4 +21,19 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
+  },
 });

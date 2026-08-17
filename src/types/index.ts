@@ -26,6 +26,7 @@ export interface UserProfile {
   photoURL?: string;
   vendor: VendorProfile;
   isOnboarded: boolean;
+  isDeleted?: boolean;
   createdAt: string;
 }
 

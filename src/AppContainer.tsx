@@ -131,7 +131,7 @@ export const AppContainer: React.FC = () => {
       {activeTab === 'dashboard' && <Header activeTab={activeTab} />}
 
       {/* Main Content Viewport */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 pt-4">
+      <main className="flex-1 max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl w-full mx-auto p-4 sm:p-6 pt-3 sm:pt-5">
         {activeTab === 'dashboard' && (
           <DashboardScreen
             onOpenTodayModal={() => setTodayModalOpen(true)}

@@ -44,7 +44,7 @@ export const Header: React.FC<{ activeTab?: ActiveTab }> = () => {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="flex items-center justify-between gap-2 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between gap-2 max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto">
         {/* App Logo & Company Brand Header */}
         <div className="flex items-center gap-3">
           <img
